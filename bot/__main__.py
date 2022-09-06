@@ -166,10 +166,10 @@ def main():
             chat_id, msg_id = map(int, f)
         bot.editMessageText("Restarted Successfully!", chat_id, msg_id, parse_mode='HTML')
         osremove(".restartmsg")
-
+'''
     if AUTHORIZED_CHATS and ospath.exists('.git'):
-        #send_changelog(bot, AUTHORIZED_CHATS, __version__)
-
+        send_changelog(bot, AUTHORIZED_CHATS, __version__)
+'''
     start_handler = CommandHandler(BotCommands.StartCommand, start, run_async=True)
     ping_handler = CommandHandler(BotCommands.PingCommand, ping,
                                   filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
