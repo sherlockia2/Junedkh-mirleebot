@@ -168,7 +168,7 @@ def main():
         osremove(".restartmsg")
 
     if AUTHORIZED_CHATS and ospath.exists('.git'):
-        send_changelog(bot, AUTHORIZED_CHATS, __version__)
+        #send_changelog(bot, AUTHORIZED_CHATS, __version__)
 
     start_handler = CommandHandler(BotCommands.StartCommand, start, run_async=True)
     ping_handler = CommandHandler(BotCommands.PingCommand, ping,
