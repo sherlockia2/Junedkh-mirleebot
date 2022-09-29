@@ -12,10 +12,8 @@ basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[FileHandler('log.txt'), StreamHandler()],
                     level=INFO)
 
-CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL')
-try:
-    if len(CONFIG_FILE_URL) == 0:
-        raise TypeError
+CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL', '')
+if len(CONFIG_FILE_URL) != 0:
     try:
         res = rget(CONFIG_FILE_URL)
         if res.status_code == 200:
@@ -25,29 +23,16 @@ try:
             log_error(f"Failed to download config.env {res.status_code}")
     except Exception as e:
         log_error(f"CONFIG_FILE_URL: {e}")
-except:
-    pass
 
 load_dotenv('config.env', override=True)
 
-UPSTREAM_REPO = environ.get('UPSTREAM_REPO')
-UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH')
-BOT_VERSION = environ.get('BOT_VERSION')
-try:
-    if len(UPSTREAM_REPO) == 0:
-       raise TypeError
-except:
+UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
+if len(UPSTREAM_REPO) == 0:
     UPSTREAM_REPO = 'https://github.com/junedkh/jmdkh-mltb'
-try:
-    if len(UPSTREAM_BRANCH) == 0:
-       raise TypeError
-except:
+
+UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
+if len(UPSTREAM_BRANCH) == 0:
     UPSTREAM_BRANCH = 'heroku'
-try:
-    if len(BOT_VERSION) == 0:
-       raise TypeError
-except:
-    BOT_VERSION = 'latest'
 
 if ospath.exists('.git'):
     srun(["rm", "-rf", ".git"])
@@ -67,7 +52,7 @@ else:
     log_error('Something went wrong while updating, check UPSTREAM_REPO if valid or not!')
 
 try:
-    res = rget(f"https://github.com/junedkh/jmdkh-mltb/releases/{BOT_VERSION}/download/jmdkh_mtlb_heroku.zip")
+    res = rget("https://github.com/junedkh/jmdkh-mltb/releases/latest/download/jmdkh_mtlb_heroku.zip")
     if res.status_code == 200:
         log_info("Downloading important files....")
         with open('jmdkh.zip', 'wb+') as f:
