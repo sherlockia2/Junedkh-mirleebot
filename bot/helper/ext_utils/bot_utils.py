@@ -21,17 +21,17 @@ PAGES = 0
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Uploading."
-    STATUS_DOWNLOADING = "Downloading."
-    STATUS_CLONING = "Cloning."
-    STATUS_WAITING = "Queued."
-    STATUS_PAUSED = "Paused."
-    STATUS_ARCHIVING = "Archiving."
-    STATUS_EXTRACTING = "Extracting."
-    STATUS_SPLITTING = "Splitting."
-    STATUS_CHECKING = "CheckingUp."
-    STATUS_SEEDING = "Seeding."
-    STATUS_CONVERTING = "Converting."
+    STATUS_UPLOADING = "Uploading"
+    STATUS_DOWNLOADING = "Downloading"
+    STATUS_CLONING = "Cloning"
+    STATUS_WAITING = "Queued"
+    STATUS_PAUSED = "Paused"
+    STATUS_ARCHIVING = "Archiving"
+    STATUS_EXTRACTING = "Extracting"
+    STATUS_SPLITTING = "Splitting"
+    STATUS_CHECKING = "CheckingUp"
+    STATUS_SEEDING = "Seeding"
+    STATUS_CONVERTING = "Converting"
 
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
@@ -131,7 +131,7 @@ def get_readable_message():
                 globals()['COUNT'] -= STATUS_LIMIT
                 globals()['PAGE_NO'] -= 1
         for index, download in enumerate(list(download_dict.values())[COUNT:], start=1):
-            msg += f"<i><b>{download.status()}</b></i>: <code>{escape(str(download.name()))}</code>"
+            msg += f"<i><b>{download.status()}</b></i> <code>{escape(str(download.name()))}</code>"
             if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_CONVERTING]:
                 msg += f"\n{get_progress_bar_string(download)} {download.progress()}"
                 msg += f"\n<b>Processed</b>: {get_readable_file_size(download.processed_bytes())} of {download.size()}"
@@ -190,13 +190,17 @@ def get_readable_message():
         bmsg += f"\n<b>Ram</b>: {virtual_memory().percent}% | <b>Uptime</b>: {get_readable_time(time() - botStartTime)}"
         bmsg += f"\n<b>DL</b>: {get_readable_file_size(dl_speed)}/s | <b>UL</b>: {get_readable_file_size(up_speed)}/s"
         if STATUS_LIMIT and tasks > STATUS_LIMIT:
-            buttons = ButtonMaker()
-            buttons.sbutton("<<", "status pre")
-            buttons.sbutton(f"{PAGE_NO}/{PAGES} ♻️", "status ref")
-            buttons.sbutton(">>", "status nex")
-            button = buttons.build_menu(3)
-            return msg + bmsg, button
+            return _get_readable_message_btns(msg, bmsg)
         return msg + bmsg, ""
+
+
+def _get_readable_message_btns(msg, bmsg):
+    buttons = ButtonMaker()
+    buttons.sbutton("<<", "status pre")
+    buttons.sbutton(f"{PAGE_NO}/{PAGES} ♻️", "status ref")
+    buttons.sbutton(">>", "status nex")
+    button = buttons.build_menu(3)
+    return msg + bmsg, button
 
 def turn(data):
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
@@ -254,7 +258,7 @@ def is_gdrive_link(url: str):
 def is_sharer_link(url: str):
     url_ = urlparse(url)
     if url_.scheme in ['http','https']:
-        return any(x in url_.netloc for x in ['gdtot', 'appdrive', 'driveapp', 'hubdrive'])
+        return any(x in url_.netloc for x in ['gdtot', 'hubdrive'])
     return False
 
 def is_mega_link(url: str):
@@ -309,19 +313,32 @@ def update_user_ldata(id_, key, value):
 def set_commands(bot):
     if config_dict['SET_COMMANDS']:
         bot.set_my_commands([
-            (f'{BotCommands.HelpCommand}','Get Detailed Help'),
-            (f'{BotCommands.MirrorCommand[0]}', 'Start Mirroring/Leech'),
-            (f'{BotCommands.YtdlCommand[0]}','Mirror/Leech yt-dlp Support Links'),
-            (f'{BotCommands.CloneCommand}','Copy File/folder To GDrive'),
-            (f'{BotCommands.StatusCommand[0]}','Get Mirror Status Message'),
-            (f'{BotCommands.BtSelectCommand}','Select files to download only torrents'),
-            (f'{BotCommands.CategorySelect}','Select category to upload only mirror'),
-            (f'{BotCommands.ListCommand[0]}','Searches Files in Drive'),
-            (f'{BotCommands.CancelMirror}','Cancel a Task'),
-            (f'{BotCommands.CancelAllCommand}','Cancel all tasks which added by you'),
-            (f'{BotCommands.UserSetCommand}','Users settings.'),
-            (f'{BotCommands.StatsCommand}','Bot Usage Stats'),
-            (f'{BotCommands.SearchCommand}','For Torrents With Installed (Qbittorrent) Search Plugins')
+        (f'{BotCommands.MirrorCommand[0]}', f'or /{BotCommands.MirrorCommand[1]} Mirror'),
+        (f'{BotCommands.LeechCommand[0]}', f'or /{BotCommands.LeechCommand[1]} Leech'),
+        (f'{BotCommands.ZipMirrorCommand[0]}', f'or /{BotCommands.ZipMirrorCommand[1]} Mirror and upload as zip'),
+        (f'{BotCommands.ZipLeechCommand[0]}', f'or /{BotCommands.ZipLeechCommand[1]} Leech and upload as zip'),
+        (f'{BotCommands.UnzipMirrorCommand[0]}', f'or /{BotCommands.UnzipMirrorCommand[1]} Mirror and extract files'),
+        (f'{BotCommands.UnzipLeechCommand[0]}', f'or /{BotCommands.UnzipLeechCommand[1]} Leech and extract files'),
+        (f'{BotCommands.QbMirrorCommand[0]}', f'or /{BotCommands.QbMirrorCommand[1]} Mirror torrent using qBittorrent'),
+        (f'{BotCommands.QbLeechCommand[0]}', f'or /{BotCommands.QbLeechCommand[1]} Leech torrent using qBittorrent'),
+        (f'{BotCommands.QbZipMirrorCommand[0]}', f'or /{BotCommands.QbZipMirrorCommand[1]} Mirror torrent and upload as zip using qb'),
+        (f'{BotCommands.QbZipLeechCommand[0]}', f'or /{BotCommands.QbZipLeechCommand[1]} Leech torrent and upload as zip using qb'),
+        (f'{BotCommands.QbUnzipMirrorCommand[0]}', f'or /{BotCommands.QbUnzipMirrorCommand[1]} Mirror torrent and extract files using qb'),
+        (f'{BotCommands.QbUnzipLeechCommand[0]}', f'or /{BotCommands.QbUnzipLeechCommand[1]} Leech torrent and extract using qb'),
+        (f'{BotCommands.YtdlCommand[0]}', f'or /{BotCommands.YtdlCommand[1]} Mirror yt-dlp supported link'),
+        (f'{BotCommands.YtdlLeechCommand[0]}', f'or /{BotCommands.YtdlLeechCommand[1]} Leech through yt-dlp supported link'),
+        (f'{BotCommands.YtdlZipCommand[0]}', f'or /{BotCommands.YtdlZipCommand[1]} Mirror yt-dlp supported link as zip'),
+        (f'{BotCommands.YtdlZipLeechCommand[0]}', f'or /{BotCommands.YtdlZipLeechCommand[1]} Leech yt-dlp support link as zip'),
+        (f'{BotCommands.CloneCommand}', 'Copy file/folder to Drive'),
+        (f'{BotCommands.StatusCommand[0]}', f'or /{BotCommands.StatusCommand[1]} Get mirror status message'),
+        (f'{BotCommands.BtSelectCommand}', 'Select files to download only torrents'),
+        (f'{BotCommands.CategorySelect}', 'Select category to upload only mirror'),
+        (f'{BotCommands.CancelMirror}', 'Cancel a Task'),
+        (f'{BotCommands.CancelAllCommand}', 'Cancel all tasks which added by you'),
+        (f'{BotCommands.ListCommand}', 'Search in Drive'),
+        (f'{BotCommands.SearchCommand}', 'Search in Torrent'),
+        (f'{BotCommands.UserSetCommand}', 'Users settings'),
+        (f'{BotCommands.HelpCommand}', 'Get detailed help'),
             ])
     else:
         bot.delete_my_commands()

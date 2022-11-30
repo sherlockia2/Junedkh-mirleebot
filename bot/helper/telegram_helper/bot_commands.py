@@ -4,7 +4,7 @@ from bot import CMD_PERFIX
 class _BotCommands:
     def __init__(self):
         self.StartCommand = f'start{CMD_PERFIX}'
-        self.MirrorCommand = (f'dl{CMD_PERFIX}', f'm{CMD_PERFIX}')
+        self.MirrorCommand = (f'mirror{CMD_PERFIX}', f'm{CMD_PERFIX}')
         self.UnzipMirrorCommand = (f'unzipmirror{CMD_PERFIX}', f'uzm{CMD_PERFIX}')
         self.ZipMirrorCommand = (f'zipmirror{CMD_PERFIX}', f'zm{CMD_PERFIX}')
         self.QbMirrorCommand = (f'qbmirror{CMD_PERFIX}', f'qm{CMD_PERFIX}')
@@ -25,7 +25,7 @@ class _BotCommands:
         self.DeleteCommand = f'del{CMD_PERFIX}'
         self.CancelMirror = f'cancel{CMD_PERFIX}'
         self.CancelAllCommand = f'cancelall{CMD_PERFIX}'
-        self.ListCommand = (f'listdrive{CMD_PERFIX}', f'list{CMD_PERFIX}')
+        self.ListCommand = f'list{CMD_PERFIX}'
         self.SearchCommand = f'search{CMD_PERFIX}'
         self.StatusCommand = (f'status{CMD_PERFIX}', f's{CMD_PERFIX}')
         self.UsersCommand = f'users{CMD_PERFIX}'

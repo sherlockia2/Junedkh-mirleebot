@@ -252,7 +252,7 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 - `SHARER_EMAIL`: youremail@gmail.com `Str`
 - `SHARER_PASS`: yourpassword_which_you_create_from `Str`
   - Currently Supported Sites:
-    > appdrive, driveapp, hubdrive
+    > hubdrive
   - Will add more in future on public demand.
   - **Note**: Must change account password from supported sharer [account](https://appdrive.info/account) settings. same email and same password.
 - `SHARER_DRIVE_SITE`: To enable upload sharer drive just add website link, for eg `https://appdrive.info`. `Str`
@@ -568,11 +568,26 @@ Where host is the name of extractor (eg. instagram, Twitch). Multiple accounts o
 ## Bot commands to be set in [@BotFather](https://t.me/BotFather)
 
 ```
-dl - or /m it will ask you to where you want to upload.
+mirror - or /m Mirror
+zipmirror - or /zm Mirror and upload as zip
+unzipmirror - or /uzm Mirror and extract files
+qbmirror - or /qm Mirror torrent using qBittorrent
+qbzipmirror - or /qzm Mirror torrent and upload as zip using qb
+qbunzipmirror - or /quzm Mirror torrent and extract files using qb
+leech - or /l Leech
+zipleech - or /zl Leech and upload as zip
+unzipleech - or /uzl Leech and extract files
+qbleech - or /ql Leech torrent using qBittorrent
+qbzipleech - or /qzl Leech torrent and upload as zip using qb
+qbunzipleech - or /quzl Leech torrent and extract using qb
 clone - Copy file/folder to Drive
 count - Count file/folder of Drive
-ytdl - or /y yt-dlp supported link it will ask you to where you want to upload.
+ytdl - or /y Mirror yt-dlp supported link
+ytdlzip - or /yz Mirror yt-dlp supported link as zip
+ytdlleech - or /yl Leech through yt-dlp supported link
+ytdlzipleech - or /yzl Leech yt-dlp support link as zip
 usetting - users settings
+bsetting - bot settings
 status - Get Mirror Status message
 catsel - select Category to upload only mirror
 btsel - select files from torrent
