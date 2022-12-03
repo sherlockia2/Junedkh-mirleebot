@@ -1,14 +1,20 @@
-from logging import getLogger, ERROR
-from os import remove as osremove, walk, path as ospath, rename as osrename
-from time import time, sleep
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram.errors import FloodWait, RPCError
-from PIL import Image
+from logging import ERROR, getLogger
+from os import path as ospath
+from os import remove as osremove
+from os import rename as osrename
+from os import walk
 from threading import RLock
+from time import sleep, time
 
-from bot import config_dict, user_data, app, GLOBAL_EXTENSION_FILTER, IS_USER_SESSION
-from bot.helper.ext_utils.fs_utils import take_ss, get_media_info, get_media_streams, clean_unwanted
+from PIL import Image
+from pyrogram.errors import FloodWait, RPCError
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+from bot import (GLOBAL_EXTENSION_FILTER, IS_USER_SESSION, app, config_dict,
+                 user_data)
 from bot.helper.ext_utils.bot_utils import get_readable_file_size
+from bot.helper.ext_utils.fs_utils import (clean_unwanted, get_media_info,
+                                           get_media_streams, take_ss)
 
 LOGGER = getLogger(__name__)
 getLogger("pyrogram").setLevel(ERROR)
@@ -66,7 +72,8 @@ class TgUploader:
         if self.__listener.seed and not self.__listener.newDir:
             clean_unwanted(self.__path)
         if self.__total_files <= self.__corrupted:
-            return self.__listener.onUploadError('Files Corrupted. Check logs')
+            self.__listener.onUploadError('Files Corrupted. Check logs!')
+            return
         LOGGER.info(f"Leech Completed: {self.name}")
         size = get_readable_file_size(self.__size)
         self.__listener.onUploadComplete(None, size, self.__msgs_dict, self.__total_files, self.__corrupted, self.name)

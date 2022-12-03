@@ -306,22 +306,16 @@ python3 generate_drive_token.py
 ```
 ------
 
-## Deploying on VPS
+### 4. Build And Run the Docker Image
 
-**IMPORTANT NOTES**:
-1. You must set `SERVER_PORT` variable to `80` or any other port you want to use.
-2. To clear the container (this will not affect on the image):
-```
-sudo docker container prune
-```
-3. To delete the images:
-```
-sudo docker image prune -a
-```
-4. Check the number of processing units of your machine with `nproc` cmd and times it by 4, then edit `AsyncIOThreadsCount` in qBittorrent.conf.
+Make sure you still mount the app folder and installed the docker from official documentation.
+- There are two methods to build and run the docker:
+  1. Using official docker commands.
+  2. Using docker-compose. (Recommended)
+
 ------
 
-### Deploying on VPS Using Docker
+#### Build And Run The Docker Image Using Official Docker Commands
 
 - Start Docker daemon (SKIP if already running):
 ```
@@ -329,13 +323,13 @@ sudo dockerd
 ```
 - Build Docker image:
 ```
-sudo docker build . -t mirror-bot
+sudo docker build . -t mltb
 ```
 - Run the image:
 ```
-sudo docker run -p 80:80 mirror-bot
+sudo docker run -p 80:80 mltb
 ```
-- To stop the image:
+- To stop the running image:
 ```
 sudo docker ps
 ```
@@ -345,14 +339,14 @@ sudo docker stop id
 
 ----
 
-### Deploying on VPS Using docker-compose
+#### Build And Run The Docker Image Using docker-compose
 
 **NOTE**: If you want to use port other than 80, change it in [docker-compose.yml](docker-compose.yml) also.
 
 ```
 sudo apt install -y docker-compose
 ```
-- Build and run Docker image:
+- Build and run Docker image or to view current running image:
 ```
 sudo docker-compose up -d
 ```
@@ -360,7 +354,7 @@ sudo docker-compose up -d
 ```
 sudo docker-compose up --build
 ```
-- To stop the image:
+- To stop the running image:
 ```
 sudo docker-compose stop
 ```
@@ -370,6 +364,23 @@ sudo docker-compose start
 ```
 - Tutorial video from Tortoolkit repo for docker-compose and checking ports
 <p><a href="https://youtu.be/c8_TU1sPK08"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
+
+------
+
+#### Docker Notes
+
+**IMPORTANT NOTES**:
+1. You must set `SERVER_PORT` variable to any port you want to use. Default is `80`.
+2. You should stop the running image before deleting the container and you should delete the container before the image.
+3. To delete the container (this will not affect on the image):
+```
+sudo docker container prune
+```
+4. To delete the images:
+```
+sudo docker image prune -a
+```
+5. Check the number of processing units of your machine with `nproc` cmd and times it by 4, then edit `AsyncIOThreadsCount` in qBittorrent.conf.
 
 ------
 
@@ -485,6 +496,7 @@ python3 add_to_team_drive.py -d SharedTeamDriveSrcID
 6. After creating user press on `Choose a connection`, then press on `Connect your application`. Choose `Driver` **python** and `version` **3.6 or later**.
 7. Copy your `connection string` and replace `<password>` with the password of your user, then press close.
 -----
+
 ## Multi Drive List
 To use list from multi TD/folder. Run driveid.py in your terminal and follow it. It will generate **list_drives.txt** file or u can simply create `list_drives.txt` file in working directory and fill it, check below format:
 ```

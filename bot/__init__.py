@@ -1,17 +1,26 @@
-from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error as log_error, info as log_info, warning as log_warning
-from socket import setdefaulttimeout
-from faulthandler import enable as faulthandler_enable
-from telegram.ext import Updater as tgUpdater
-from qbittorrentapi import Client as qbClient
-from aria2p import API as ariaAPI, Client as ariaClient
-from os import remove as osremove, path as ospath, environ
-from subprocess import Popen, run as srun
-from time import sleep, time
-from threading import Thread, Lock
-from dotenv import load_dotenv
-from pyrogram import Client, enums
 from asyncio import get_event_loop
+from faulthandler import enable as faulthandler_enable
+from logging import INFO, FileHandler, StreamHandler, basicConfig
+from logging import error as log_error
+from logging import getLogger
+from logging import info as log_info
+from logging import warning as log_warning
+from os import environ
+from os import path as ospath
+from os import remove as osremove
+from socket import setdefaulttimeout
+from subprocess import Popen
+from subprocess import run as srun
+from threading import Lock, Thread
+from time import sleep, time
+
+from aria2p import API as ariaAPI
+from aria2p import Client as ariaClient
+from dotenv import load_dotenv
 from pymongo import MongoClient
+from pyrogram import Client, enums
+from qbittorrentapi import Client as qbClient
+from telegram.ext import Updater as tgUpdater
 
 main_loop = get_event_loop()
 
@@ -543,7 +552,7 @@ def aria2c_init():
         aria2.add_uris([link], {'dir': dire})
         sleep(3)
         downloads = aria2.get_downloads()
-        sleep(20)
+        sleep(15)
         aria2.remove(downloads, force=True, files=True, clean=True)
     except Exception as e:
         log_error(f"Aria2c initializing error: {e}")
@@ -555,8 +564,12 @@ aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-downlo
 if not aria2_options:
     aria2_options = aria2.client.get_global_option()
     del aria2_options['dir']
-    del aria2_options['max-download-limit']
-    del aria2_options['lowest-speed-limit']
+else:
+    a2c_glo = {}
+    for op in aria2c_global:
+        if op in aria2_options:
+            a2c_glo[op] = aria2_options[op]
+    aria2.set_global_options(a2c_glo)
 
 qb_client = get_client()
 if not qbit_options:

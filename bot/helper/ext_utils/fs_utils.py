@@ -1,16 +1,23 @@
-from os import remove as osremove, path as ospath, mkdir, walk, listdir, rmdir, makedirs
-from sys import exit as sysexit
 from json import loads as jsonloads
-from shutil import rmtree
-from PIL import Image
-from magic import Magic
-from subprocess import run as srun, check_output, Popen
-from time import time
 from math import ceil
-from re import split as re_split, I
+from os import listdir, makedirs, mkdir
+from os import path as ospath
+from os import remove as osremove
+from os import rmdir, walk
+from re import I
+from re import split as re_split
+from shutil import disk_usage, rmtree
+from subprocess import Popen, check_output
+from subprocess import run as srun
+from sys import exit as sysexit
+from time import time
 
+from magic import Magic
+from PIL import Image
+
+from bot import (DOWNLOAD_DIR, LOGGER, MAX_SPLIT_SIZE, app, aria2, config_dict,
+                 get_client)
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
-from bot import aria2, app, LOGGER, DOWNLOAD_DIR, get_client, MAX_SPLIT_SIZE, config_dict
 
 ARCH_EXT = [".tar.bz2", ".tar.gz", ".bz2", ".gz", ".tar.xz", ".tar", ".tbz2", ".tgz", ".lzma2",
             ".zip", ".7z", ".z", ".rar", ".iso", ".wim", ".cab", ".apm", ".arj", ".chm",
@@ -260,3 +267,18 @@ def get_media_streams(path):
             is_audio = True
 
     return is_video, is_audio
+
+def check_storage_threshold(size: int, arch=False, alloc=False):
+    STORAGE_THRESHOLD = config_dict['STORAGE_THRESHOLD']
+    if not alloc:
+        if not arch:
+            if disk_usage(DOWNLOAD_DIR).free - size < STORAGE_THRESHOLD * 1024**3:
+                return False
+        elif disk_usage(DOWNLOAD_DIR).free - (size * 2) < STORAGE_THRESHOLD * 1024**3:
+            return False
+    elif not arch:
+        if disk_usage(DOWNLOAD_DIR).free < STORAGE_THRESHOLD * 1024**3:
+            return False
+    elif disk_usage(DOWNLOAD_DIR).free - size < STORAGE_THRESHOLD * 1024**3:
+        return False
+    return True

@@ -1,11 +1,12 @@
-from bot import DATABASE_URL, dispatcher
+from telegram.ext import CommandHandler
+
+from bot import DATABASE_URL, config_dict, dispatcher
 from bot.helper.ext_utils.bot_utils import is_magnet, is_url, new_thread
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.jmdkh_utils import extract_link
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage
-from telegram.ext import CommandHandler
 
 
 def _rmdb(message, bot):
@@ -40,30 +41,24 @@ def _rmdb(message, bot):
                     except IndexError:
                         pass
             elif file.mime_type != "application/x-bittorrent":
-                exist = DbManger().check_download(file.file_unique_id)
-                if exist:
-                    DbManger().remove_download(exist['_id'])
-                    msg = 'Download is removed from database successfully'
-                    msg += f'\n{exist["tag"]} Your download is removed.'
-                    if tag:
-                        msg += f'\n{tag} Now you can download this link'
-                else:
-                    msg = 'This file is not exists in database'
-                return sendMessage(msg, bot, message)
+                link = file.file_unique_id
             else:
                 link = file.get_file().download_url
                 tfile = True
 
-    rawlink = extract_link(tfile, link)
-    exist = DbManger().check_download(rawlink)
-    if exist:
-        DbManger().remove_download(exist['_id'])
-        msg = 'Download is removed from database successfully'
-        msg += f'\n{exist["tag"]} Your download is removed.'
-        if tag:
-            msg += f'\n{tag} Now you can download this link'
+    if DATABASE_URL and config_dict['STOP_DUPLICATE_TASKS']:
+        raw_url = extract_link(link, tfile)
+        exist = DbManger().check_download(raw_url)
+        if exist:
+            DbManger().remove_download(exist['_id'])
+            msg = 'Download is removed from database successfully'
+            msg += f'\n{exist["tag"]} Your download is removed.'
+            if tag:
+                msg += f'\n{tag} Now you can download this link'
+        else:
+            msg = 'This download is not exists in database'
     else:
-        msg = 'This download is not exists in database'
+        msg = 'STOP_DUPLICATE_TASKS feature is not enabled'
     return sendMessage(msg, bot, message)
 
 @new_thread
