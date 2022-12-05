@@ -38,8 +38,7 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'RSS_DELAY': 900,
                   'STATUS_UPDATE_INTERVAL': 10,
                   'SEARCH_LIMIT': 0,
-                  'UPSTREAM_BRANCH': 'master',
-                  'BUTTON_TIMEOUT': 30}
+                  'UPSTREAM_BRANCH': 'master'}
 
 
 def load_config():
@@ -170,6 +169,9 @@ def load_config():
 
     STATUS_LIMIT = environ.get('STATUS_LIMIT', '')
     STATUS_LIMIT = '' if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
+
+    USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
+    USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
 
     RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
     RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
@@ -333,9 +335,6 @@ def load_config():
     else:
         MIRROR_LOG = int(MIRROR_LOG)
 
-    BUTTON_TIMEOUT = environ.get('BUTTON_TIMEOUT', '')
-    BUTTON_TIMEOUT = 30 if len(BUTTON_TIMEOUT) == 0 else int(BUTTON_TIMEOUT)
-
     DRIVES_NAMES.clear()
     DRIVES_IDS.clear()
     INDEX_URLS.clear()
@@ -411,6 +410,7 @@ def load_config():
                    'SEARCH_PLUGINS': SEARCH_PLUGINS,
                    'SERVER_PORT': SERVER_PORT,
                    'STATUS_LIMIT': STATUS_LIMIT,
+                   'USER_MAX_TASKS': USER_MAX_TASKS,
                    'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
                    'STOP_DUPLICATE': STOP_DUPLICATE,
                    'SUDO_USERS': SUDO_USERS,
@@ -447,8 +447,7 @@ def load_config():
                    'SHARER_PASS': SHARER_PASS,
                    'DISABLE_LEECH': DISABLE_LEECH,
                    'ENABLE_DM': ENABLE_DM,
-                   'DELETE_LINKS': DELETE_LINKS,
-                   'BUTTON_TIMEOUT': BUTTON_TIMEOUT})
+                   'DELETE_LINKS': DELETE_LINKS})
 
     if DATABASE_URL:
         DbManger().update_config(config_dict)

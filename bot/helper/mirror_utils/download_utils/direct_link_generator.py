@@ -110,7 +110,7 @@ def uptobox(url: str) -> str:
             try:
                 req = rget(file_link)
             except Exception as e:
-                raise DirectDownloadLinkException(f"ERROR: {e}")
+                raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
             result = req.json()
             if result['message'].lower() == 'success':
                 dl_url = result['data']['dlLink']
@@ -143,7 +143,7 @@ def mediafire(url: str) -> str:
         info = page.find('a', {'aria-label': 'Download file'})
         return info.get('href')
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def osdn(url: str) -> str:
     """ OSDN direct link generator """
@@ -155,7 +155,7 @@ def osdn(url: str) -> str:
     try:
         page = BeautifulSoup(rget(link, allow_redirects=True).content, 'lxml')
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     info = page.find('a', {'class': 'mirror_link'})
     link = unquote(osdn_link + info['href'])
     mirrors = page.find('form', {'id': 'mirror-select-form'}).findAll('tr')
@@ -184,7 +184,7 @@ def hxfile(url: str) -> str:
     try:
         return Bypass().bypass_filesIm(url)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def anonfiles(url: str) -> str:
     """ Anonfiles direct link generator
@@ -193,7 +193,7 @@ def anonfiles(url: str) -> str:
     try:
         return Bypass().bypass_anonfiles(url)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def letsupload(url: str) -> str:
     """ Letsupload direct link generator
@@ -206,7 +206,7 @@ def letsupload(url: str) -> str:
     try:
         return Bypass().bypass_url(link)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def fembed(link: str) -> str:
     """ Fembed direct link generator
@@ -218,7 +218,7 @@ def fembed(link: str) -> str:
         lst_link = [dl_url[i] for i in dl_url]
         return lst_link[count-1]
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def sbembed(link: str) -> str:
     """ Sbembed direct link generator
@@ -230,7 +230,7 @@ def sbembed(link: str) -> str:
         lst_link = [dl_url[i] for i in dl_url]
         return lst_link[count-1]
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def onedrive(link: str) -> str:
     """ Onedrive direct link generator
@@ -241,7 +241,7 @@ def onedrive(link: str) -> str:
     try:
         resp = rhead(direct_link1)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if resp.status_code != 302:
         raise DirectDownloadLinkException("ERROR: Unauthorized link, the link may be private")
     return resp.next.url
@@ -259,7 +259,7 @@ def pixeldrain(url: str) -> str:
     try:
         resp = rget(info_link).json()
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if resp["success"]:
         return dl_link
     else:
@@ -272,7 +272,7 @@ def antfiles(url: str) -> str:
     try:
         return Bypass().bypass_antfiles(url)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def streamtape(url: str) -> str:
     """ Streamtape direct link generator
@@ -281,7 +281,7 @@ def streamtape(url: str) -> str:
     try:
         return Bypass().bypass_streamtape(url)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def racaty(url: str) -> str:
     """ Racaty direct link generator
@@ -300,7 +300,7 @@ def racaty(url: str) -> str:
         rsoup = BeautifulSoup(rapost.text, "lxml")
         return rsoup.find("a", {"id": "uniqueExpirylink"})["href"].replace(" ", "%20")
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def fichier(link: str) -> str:
     """ 1Fichier direct link generator
@@ -373,7 +373,7 @@ def solidfiles(url: str) -> str:
         mainOptions = str(re_search(r'viewerOptions\'\,\ (.*?)\)\;', pageSource).group(1))
         return jsonloads(mainOptions)["downloadUrl"]
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 def krakenfiles(page_link: str) -> str:
     """ krakenfiles direct link generator
@@ -383,7 +383,7 @@ def krakenfiles(page_link: str) -> str:
     try:
         page_resp = client.get(page_link)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     soup = BeautifulSoup(page_resp.text, "lxml")
     try:
         token = soup.find("input", id="dl-token")["value"]
@@ -430,7 +430,7 @@ def gdtot(url: str) -> str:
         client.cookies.set(name='crypt', value=config_dict['GDTOT_CRYPT'], domain=parsed_url.netloc)
         res = client.get(url)
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     try:
         res = client.get(f"{parsed_url.scheme}://{parsed_url.netloc}/dld?id={url.split('/')[-1]}")
         matches = re_findall('gd=(.*?)&', res.text)
@@ -451,7 +451,7 @@ def hubdrive(url: str) -> str:
     try:
         client.post(f'{parsed_url.scheme}://{parsed_url.netloc}/sign', data={'email': SHARER_EMAIL, 'pass': SHARER_PASS})
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     try:
         client.cookies.get_dict()['crypt']
     except:

@@ -256,6 +256,9 @@ DUMP_CHAT = '' if len(DUMP_CHAT) == 0 else int(DUMP_CHAT)
 STATUS_LIMIT = environ.get('STATUS_LIMIT', '')
 STATUS_LIMIT = '' if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
 
+USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
+USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
+
 CMD_PERFIX = environ.get('CMD_PERFIX', '')
 
 RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
@@ -387,9 +390,6 @@ if len(MIRROR_LOG) != 0 and not MIRROR_LOG.startswith('-100') or len(MIRROR_LOG)
 else:
     MIRROR_LOG = int(MIRROR_LOG)
 
-BUTTON_TIMEOUT = environ.get('BUTTON_TIMEOUT', '')
-BUTTON_TIMEOUT = 30 if len(BUTTON_TIMEOUT) == 0 else int(BUTTON_TIMEOUT)
-
 fsubid = environ.get('FSUB_IDS', '')
 FSUB_IDS = {int(_id.strip()) for _id in fsubid.split()} if len(fsubid) != 0 else set()
 
@@ -424,6 +424,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                 'SEARCH_PLUGINS': SEARCH_PLUGINS,
                 'SERVER_PORT': SERVER_PORT,
                 'STATUS_LIMIT': STATUS_LIMIT,
+                'USER_MAX_TASKS': USER_MAX_TASKS,
                 'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
                 'STOP_DUPLICATE': STOP_DUPLICATE,
                 'SUDO_USERS': SUDO_USERS,
@@ -460,8 +461,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                 'SHARER_PASS': SHARER_PASS,
                 'DISABLE_LEECH': DISABLE_LEECH,
                 'ENABLE_DM': ENABLE_DM,
-                'DELETE_LINKS': DELETE_LINKS,
-                'BUTTON_TIMEOUT': BUTTON_TIMEOUT}
+                'DELETE_LINKS': DELETE_LINKS}
 
 if GDRIVE_ID:
     DRIVES_NAMES.append("Main")

@@ -13,7 +13,6 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
-PROGRESS_INCOMPLETE = ['○','◔', '◑', '◕', '⬤', '○','◔', '◑', '◕','⬤']
 
 COUNT = 0
 PAGE_NO = 1
@@ -21,17 +20,17 @@ PAGES = 0
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Uploading"
-    STATUS_DOWNLOADING = "Downloading"
-    STATUS_CLONING = "Cloning"
-    STATUS_WAITING = "Queued"
-    STATUS_PAUSED = "Paused"
-    STATUS_ARCHIVING = "Archiving"
-    STATUS_EXTRACTING = "Extracting"
-    STATUS_SPLITTING = "Splitting"
-    STATUS_CHECKING = "CheckingUp"
-    STATUS_SEEDING = "Seeding"
-    STATUS_CONVERTING = "Converting"
+    STATUS_UPLOADING = "Upload"
+    STATUS_DOWNLOADING = "Download"
+    STATUS_CLONING = "Clone"
+    STATUS_WAITING = "Queue"
+    STATUS_PAUSED = "Pause"
+    STATUS_ARCHIVING = "Archive"
+    STATUS_EXTRACTING = "Extract"
+    STATUS_SPLITTING = "Split"
+    STATUS_CHECKING = "CheckUp"
+    STATUS_SEEDING = "Seed"
+    STATUS_CONVERTING = "Convert"
 
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
@@ -107,18 +106,14 @@ def bt_selection_buttons(id_: str, isCanCncl: bool = True):
     return buttons.build_menu(2)
 
 def get_progress_bar_string(status):
-    completed = status.processed_bytes() / 9
-    total = status.size_raw() / 9
+    completed = status.processed_bytes() / 8
+    total = status.size_raw() / 8
     p = 0 if total == 0 else round(completed * 100 / total)
     p = min(max(p, 0), 100)
-    cFull = p // 9
-    cPart = p % 9 - 1
-    p_str = "⬤" * cFull
-    if cPart >= 0:
-        p_str += PROGRESS_INCOMPLETE[cPart]
-    p_str += "○" * (11 - cFull)
-    p_str = f"「{p_str}」"
-    return p_str
+    cFull = p // 8
+    p_str = '■' * cFull
+    p_str += '□' * (12 - cFull)
+    return f"[{p_str}]"
 
 def get_readable_message():
     with download_dict_lock:
@@ -131,7 +126,7 @@ def get_readable_message():
                 globals()['COUNT'] -= STATUS_LIMIT
                 globals()['PAGE_NO'] -= 1
         for index, download in enumerate(list(download_dict.values())[COUNT:], start=1):
-            msg += f"<i><b>{download.status()}</b></i> <code>{escape(str(download.name()))}</code>"
+            msg += f"<b>{download.status()}</b>: <code>{escape(str(download.name()))}</code>"
             if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_CONVERTING]:
                 msg += f"\n{get_progress_bar_string(download)} {download.progress()}"
                 msg += f"\n<b>Processed</b>: {get_readable_file_size(download.processed_bytes())} of {download.size()}"
@@ -159,7 +154,7 @@ def get_readable_message():
                     pass
             msg += f"\n<b>Engine</b>: {download.engine()}"
             msg += f"\n<b>Upload</b>: {download.mode()}"
-            msg += f"\n/{BotCommands.CancelMirror}_{download.gid()}"
+            msg += f"\n<b>Stop</b>: /{BotCommands.CancelMirror}_{download.gid()}"
             msg += "\n\n"
             if STATUS_LIMIT and index == STATUS_LIMIT:
                 break
@@ -186,8 +181,8 @@ def get_readable_message():
                     up_speed += float(spd.split('K')[0]) * 1024
                 elif 'M' in spd:
                     up_speed += float(spd.split('M')[0]) * 1048576
-        bmsg = f"<b>Cpu</b>: {cpu_percent()}% | <b>Free</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
-        bmsg += f"\n<b>Ram</b>: {virtual_memory().percent}% | <b>Uptime</b>: {get_readable_time(time() - botStartTime)}"
+        bmsg = f"<b>CPU</b>: {cpu_percent()}% | <b>FREE</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
+        bmsg += f"\n<b>RAM</b>: {virtual_memory().percent}% | <b>UPTIME</b>: {get_readable_time(time() - botStartTime)}"
         bmsg += f"\n<b>DL</b>: {get_readable_file_size(dl_speed)}/s | <b>UL</b>: {get_readable_file_size(up_speed)}/s"
         if STATUS_LIMIT and tasks > STATUS_LIMIT:
             return _get_readable_message_btns(msg, bmsg)
@@ -224,6 +219,13 @@ def turn(data):
         return True
     except:
         return False
+
+def check_user_tasks(user_id, isSudo):
+    if maxtask:=config_dict['USER_MAX_TASKS']:
+        if isSudo:
+            return
+        if tasks:= getAllDownload(MirrorStatus.STATUS_DOWNLOADING, user_id, False):
+            return len(tasks) <= maxtask
 
 def get_readable_time(seconds: int) -> str:
     result = ''
