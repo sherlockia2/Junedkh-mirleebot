@@ -1,14 +1,16 @@
-from re import findall as re_findall
-from threading import Thread, Event
-from time import time
-from math import ceil
 from html import escape
-from psutil import disk_usage, cpu_percent, virtual_memory
-from requests import head as rhead
-from urllib.request import urlopen
+from math import ceil
+from re import findall as re_findall
+from threading import Event, Thread
+from time import time
 from urllib.parse import urlparse
+from urllib.request import urlopen
 
-from bot import download_dict, download_dict_lock, botStartTime, DOWNLOAD_DIR, user_data, config_dict
+from psutil import cpu_percent, disk_usage, virtual_memory
+from requests import head as rhead
+
+from bot import (DOWNLOAD_DIR, botStartTime, config_dict, download_dict,
+                 download_dict_lock, user_data)
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
@@ -220,12 +222,9 @@ def turn(data):
     except:
         return False
 
-def check_user_tasks(user_id, isSudo):
-    if maxtask:=config_dict['USER_MAX_TASKS']:
-        if isSudo:
-            return
-        if tasks:= getAllDownload(MirrorStatus.STATUS_DOWNLOADING, user_id, False):
-            return len(tasks) <= maxtask
+def check_user_tasks(user_id, maxtask):
+    if tasks:= getAllDownload(MirrorStatus.STATUS_DOWNLOADING, user_id, False):
+        return len(tasks) >= maxtask
 
 def get_readable_time(seconds: int) -> str:
     result = ''

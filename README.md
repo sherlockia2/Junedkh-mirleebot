@@ -204,7 +204,6 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 - `LEECH_SPLIT_SIZE`: Size of split in bytes. Default is `2GB`. Default is `4GB` if your account is premium. `Str`
 - `AS_DOCUMENT`: Default type of Telegram file upload. Default is `False` mean as media. `Bool`
 - `EQUAL_SPLITS`: Split files larger than **LEECH_SPLIT_SIZE** into equal parts size (Not working with zip cmd). Default is `False`. `Bool`
-- `LEECH_FILENAME_PERFIX`: Add custom word to leeched file name. `Str`
 - `DUMP_CHAT`: Chat ID. Upload files to specific chat. `Str`. **NOTE**: Only available for superGroup/channel. Add `-100` before channel/superGroup id. In short don't add bot id or your id!
 - `USER_SESSION_STRING`: To download/upload from your telegram account. If you own premium account. To generate session string use this command `python3 generate_string_session.py` after mounting repo folder for sure. `Str`. **NOTE**: You can't use bot with private message. Use it with superGroup.
 
@@ -255,10 +254,6 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
     > hubdrive
   - Will add more in future on public demand.
   - **Note**: Must change account password from supported sharer [account](https://appdrive.info/account) settings. same email and same password.
-- `SHARER_DRIVE_SITE`: To enable upload sharer drive just add website link, for eg `https://appdrive.info`. `Str`
-  - **Note**: Must added `SHARER_EMAIL` and `SHARER_PASS`
-- `ENABLE_SHARER_LIST`: To enable gdflix upload link while using `/list_drive` cmd. Default is `False`. `Bool`
-  - **Note**: it will make slower your /list_drive command. or may sharer drive account suspend due to mass link genrating.
 
 ### Group Features
 - `FSUB_IDS`: Fill chat_id of groups/channel you want to force subscribe. Separate them by space. `Str`

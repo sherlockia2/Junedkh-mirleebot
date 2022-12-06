@@ -1,17 +1,20 @@
-from os import remove as osremove, path as ospath, mkdir
-from PIL import Image
-from telegram.ext import CommandHandler, CallbackQueryHandler, MessageHandler, Filters
-from time import sleep, time
 from functools import partial
 from html import escape
+from os import mkdir, path, remove
+from time import sleep, time
 
-from bot import user_data, dispatcher, config_dict, DATABASE_URL
-from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, editMessage
-from bot.helper.telegram_helper.filters import CustomFilters
+from PIL import Image
+from telegram.ext import (CallbackQueryHandler, CommandHandler, Filters,
+                          MessageHandler)
+
+from bot import DATABASE_URL, config_dict, dispatcher, user_data
+from bot.helper.ext_utils.bot_utils import update_user_ldata
+from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.ext_utils.bot_utils import update_user_ldata
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.telegram_helper.message_utils import (editMessage, sendMarkup,
+                                                      sendMessage)
 
 handler_dict = {}
 
@@ -28,18 +31,26 @@ def get_user_settings(from_user):
         ltype = "MEDIA"
         buttons.sbutton("Send As Document", f"userset {user_id} doc")
 
+    if user_dict and user_dict.get('lprefix'):
+        lprefix = user_dict['lprefix']
+        buttons.sbutton("Change Leech Prefix", f"userset {user_id} lprefix")
+        buttons.sbutton("Remove Leech Prefix", f"userset {user_id} rlpre")
+    else:
+        buttons.sbutton("Add Leech Prefix", f"userset {user_id} lprefix")
+        lprefix = 'None'
+
     if user_dict and user_dict.get('yt_ql'):
         ytq = user_dict['yt_ql']
-        buttons.sbutton("Change YT-DLP Quality", f"userset {user_id} ytq")
+        buttons.sbutton("Change YT-DLP Quality", f"userset {user_id} yt_ql")
         buttons.sbutton("Remove YT-DLP Quality", f"userset {user_id} rytq")
     elif config_dict['YT_DLP_QUALITY']:
         ytq = config_dict['YT_DLP_QUALITY']
-        buttons.sbutton("Set YT-DLP Quality", f"userset {user_id} ytq")
+        buttons.sbutton("Set YT-DLP Quality", f"userset {user_id} yt_ql")
     else:
-        buttons.sbutton("Set YT-DLP Quality", f"userset {user_id} ytq")
+        buttons.sbutton("Set YT-DLP Quality", f"userset {user_id} yt_ql")
         ytq = 'None'
 
-    if ospath.exists(thumbpath):
+    if path.exists(thumbpath):
         thumbmsg = "Exists"
         buttons.sbutton("Change Thumbnail", f"userset {user_id} sthumb")
         buttons.sbutton("Delete Thumbnail", f"userset {user_id} dthumb")
@@ -49,9 +60,10 @@ def get_user_settings(from_user):
 
     buttons.sbutton("Close", f"userset {user_id} close")
     text = f"<u>Settings for <a href='tg://user?id={user_id}'>{name}</a></u>\n"\
-           f"Leech Type <b>{ltype}</b>\n"\
-           f"Custom Thumbnail <b>{thumbmsg}</b>\n"\
-           f"YT-DLP Quality is <b><code>{escape(ytq)}</code></b>"
+            f"Leech Type <b>{ltype}</b>\n" \
+            f"Custom Thumbnail <b>{thumbmsg}</b>\n" \
+            f"YT-DLP Quality is <code>{escape(ytq)}</code>\n" \
+            f"Leech Prefix <code>{escape(lprefix)}</code>"
     return text, buttons.build_menu(1)
 
 def update_user_settings(message, from_user):
@@ -60,14 +72,33 @@ def update_user_settings(message, from_user):
 
 def user_settings(update, context):
     msg, button = get_user_settings(update.message.from_user)
-    buttons_msg = sendMarkup(msg, context.bot, update.message, button)
+    sendMarkup(msg, context.bot, update.message, button)
 
-def set_yt_quality(update, context, omsg):
+def get_message(key):
+    if key == 'yt_ql':
+        rmsg = f'''
+Send YT-DLP Qaulity. Timeout: 60 sec
+Examples:
+1. <code>{escape('bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080]')}</code> this will give 1080p-mp4.
+2. <code>{escape('bv*[height<=720][ext=webm]+ba/b[height<=720]')}</code> this will give 720p-webm.
+Check all available qualities options <a href="https://github.com/yt-dlp/yt-dlp#filtering-formats">HERE</a>.
+        '''
+    elif key == 'lprefix':
+        rmsg = f'''
+Send Leech Prefix. Timeout: 60 sec
+Examples:
+1. <code>{escape('<b>@JMDKH_Team</b>')}</code> this will give <b>@JMDKH_Team</b>  <code>50MB.bin</code>.
+2. <code>{escape('<code>@JMDKH_Team</code>')}</code> this will give <code>@JMDKH_Team</code> <code>50MB.bin</code>.
+Check all available formatting options <a href="https://core.telegram.org/bots/api#formatting-options">HERE</a>.
+        '''
+    return rmsg
+
+def set_values(update, context, omsg, key):
     message = update.message
     user_id = message.from_user.id
     handler_dict[user_id] = False
     value = message.text
-    update_user_ldata(user_id, 'yt_ql', value)
+    update_user_ldata(user_id, key, value)
     update.message.delete()
     update_user_settings(omsg, message.from_user)
     if DATABASE_URL:
@@ -77,14 +108,14 @@ def set_thumb(update, context, omsg):
     message = update.message
     user_id = message.from_user.id
     handler_dict[user_id] = False
-    path = "Thumbnails/"
-    if not ospath.isdir(path):
-        mkdir(path)
+    path_ = "Thumbnails/"
+    if not path.isdir(path_):
+        mkdir(path_)
     photo_dir = message.photo[-1].get_file().download()
     user_id = message.from_user.id
-    des_dir = ospath.join(path, f'{user_id}.jpg')
+    des_dir = path.join(path_, f'{user_id}.jpg')
     Image.open(photo_dir).convert("RGB").save(des_dir, "JPEG")
-    osremove(photo_dir)
+    remove(photo_dir)
     update_user_ldata(user_id, 'thumb', des_dir)
     update.message.delete()
     update_user_settings(omsg, message.from_user)
@@ -112,10 +143,10 @@ def edit_user_settings(update, context):
         if DATABASE_URL:
             DbManger().update_user_data(user_id)
     elif data[2] == "dthumb":
-        path = f"Thumbnails/{user_id}.jpg"
-        if ospath.lexists(path):
+        path_ = f"Thumbnails/{user_id}.jpg"
+        if path.lexists(path_):
             query.answer(text="Thumbnail Removed!", show_alert=True)
-            osremove(path)
+            remove(path_)
             update_user_ldata(user_id, 'thumb', '')
             update_user_settings(message, query.from_user)
             if DATABASE_URL:
@@ -143,7 +174,7 @@ def edit_user_settings(update, context):
                 handler_dict[user_id] = False
                 update_user_settings(message, query.from_user)
         dispatcher.remove_handler(photo_handler)
-    elif data[2] == 'ytq':
+    elif data[2] in ['yt_ql', 'lprefix']:
         query.answer()
         if handler_dict.get(user_id):
             handler_dict[user_id] = False
@@ -153,15 +184,9 @@ def edit_user_settings(update, context):
         buttons = ButtonMaker()
         buttons.sbutton("Back", f"userset {user_id} back")
         buttons.sbutton("Close", f"userset {user_id} close")
-        rmsg = f'''
-Send YT-DLP Qaulity. Timeout: 60 sec
-Examples:
-1. <code>{escape('bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080]')}</code> this will give 1080p-mp4.
-2. <code>{escape('bv*[height<=720][ext=webm]+ba/b[height<=720]')}</code> this will give 720p-webm.
-Check all available qualities options <a href="https://github.com/yt-dlp/yt-dlp#filtering-formats">HERE</a>.
-        '''
+        rmsg = get_message(data[2])
         editMessage(rmsg, message, buttons.build_menu(1))
-        partial_fnc = partial(set_yt_quality, omsg=message)
+        partial_fnc = partial(set_values, omsg=message, key=data[2])
         value_handler = MessageHandler(filters=Filters.text & Filters.chat(message.chat.id) & Filters.user(user_id),
                                        callback=partial_fnc, run_async=True)
         dispatcher.add_handler(value_handler)
@@ -173,6 +198,12 @@ Check all available qualities options <a href="https://github.com/yt-dlp/yt-dlp#
     elif data[2] == 'rytq':
         query.answer(text="YT-DLP Quality Removed!", show_alert=True)
         update_user_ldata(user_id, 'yt_ql', '')
+        update_user_settings(message, query.from_user)
+        if DATABASE_URL:
+            DbManger().update_user_data(user_id)
+    elif data[2] == 'rlpre':
+        query.answer(text="Leech Prefix Removed!", show_alert=True)
+        update_user_ldata(user_id, 'lprefix', '')
         update_user_settings(message, query.from_user)
         if DATABASE_URL:
             DbManger().update_user_data(user_id)

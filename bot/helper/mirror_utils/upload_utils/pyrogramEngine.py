@@ -1,8 +1,7 @@
 from logging import ERROR, getLogger
 from os import path as ospath
-from os import remove as osremove
-from os import rename as osrename
-from os import walk
+from os import remove, rename, walk
+from re import sub
 from threading import RLock
 from time import sleep, time
 
@@ -41,6 +40,7 @@ class TgUploader:
         self.__is_corrupted = False
         self.__size = size
         self.__button = None
+        self.__lprefix = None
         self.__msg_to_reply()
         self.__user_settings()
 
@@ -79,12 +79,12 @@ class TgUploader:
         self.__listener.onUploadComplete(None, size, self.__msgs_dict, self.__total_files, self.__corrupted, self.name)
 
     def __upload_file(self, up_path, file_, dirpath):
-        LEECH_FILENAME_PERFIX = config_dict['LEECH_FILENAME_PERFIX']
-        if LEECH_FILENAME_PERFIX:
-            cap_mono = f"{LEECH_FILENAME_PERFIX} <code>{file_}</code>"
-            file_ = f"{LEECH_FILENAME_PERFIX} {file_}"
+        if self.__lprefix:
+            cap_mono = f"{self.__lprefix} <code>{file_}</code>"
+            self.__lprefix = sub('<.*?>', '', self.__lprefix)
+            file_ = f"{self.__lprefix} {file_}"
             new_path = ospath.join(dirpath, file_)
-            osrename(up_path, new_path)
+            rename(up_path, new_path)
             up_path = new_path
         else:
             cap_mono = f"<code>{file_}</code>"
@@ -100,7 +100,7 @@ class TgUploader:
                         thumb = take_ss(up_path, duration)
                         if self.__is_cancelled:
                             if self.__thumb is None and thumb and ospath.lexists(thumb):
-                                osremove(thumb)
+                                remove(thumb)
                             return
                     if thumb:
                         with Image.open(thumb) as img:
@@ -111,7 +111,7 @@ class TgUploader:
                     if not file_.upper().endswith(("MKV", "MP4")):
                         file_ = f"{ospath.splitext(file_)[0]}.mp4"
                         new_path = ospath.join(dirpath, file_)
-                        osrename(up_path, new_path)
+                        rename(up_path, new_path)
                         up_path = new_path
                     self.__sent_msg = self.__sent_msg.reply_video(video=up_path,
                                                                   quote=True,
@@ -150,7 +150,7 @@ class TgUploader:
                     thumb = take_ss(up_path, None)
                     if self.__is_cancelled:
                         if self.__thumb is None and thumb and ospath.lexists(thumb):
-                            osremove(thumb)
+                            remove(thumb)
                         return
                 self.__sent_msg = self.__sent_msg.reply_document(document=up_path,
                                                                  quote=True,
@@ -182,11 +182,11 @@ class TgUploader:
             self.__corrupted += 1
             self.__is_corrupted = True
         if self.__thumb is None and thumb and ospath.lexists(thumb):
-            osremove(thumb)
+            remove(thumb)
         if not self.__is_cancelled and \
                    (not self.__listener.seed or self.__listener.newDir or dirpath.endswith("splited_files_mltb")):
             try:
-                osremove(up_path)
+                remove(up_path)
             except:
                 pass
 
@@ -206,6 +206,7 @@ class TgUploader:
                 self.__as_doc = True
             elif user_data[user_id].get('as_media'):
                 self.__as_doc = False
+            self.__lprefix = user_data[user_id].get('lprefix')
         if not ospath.lexists(self.__thumb):
             self.__thumb = None
 

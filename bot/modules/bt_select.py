@@ -1,11 +1,15 @@
-from telegram.ext import CommandHandler, CallbackQueryHandler
-from os import remove, path as ospath
+from os import path, remove
 
-from bot import aria2, download_dict, dispatcher, download_dict_lock, LOGGER
+from telegram.ext import CallbackQueryHandler, CommandHandler
+
+from bot import LOGGER, aria2, dispatcher, download_dict, download_dict_lock
+from bot.helper.ext_utils.bot_utils import (MirrorStatus, bt_selection_buttons,
+                                            getDownloadByGid)
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, sendStatusMessage
-from bot.helper.ext_utils.bot_utils import getDownloadByGid, MirrorStatus, bt_selection_buttons
+from bot.helper.telegram_helper.message_utils import (sendMarkup, sendMessage,
+                                                      sendStatusMessage)
+
 
 def select(update, context):
     user_id = update.message.from_user.id
@@ -88,13 +92,13 @@ def get_confirm(update, context):
         if len(id_) > 20:
             client = dl.client()
             tor_info = client.torrents_info(torrent_hash=id_)[0]
-            path = tor_info.content_path.rsplit('/', 1)[0]
+            path_ = tor_info.content_path.rsplit('/', 1)[0]
             res = client.torrents_files(torrent_hash=id_)
             for f in res:
                 if f.priority == 0:
-                    f_paths = [f"{path}/{f.name}", f"{path}/{f.name}.!qB"]
+                    f_paths = [f"{path_}/{f.name}", f"{path_}/{f.name}.!qB"]
                     for f_path in f_paths:
-                       if ospath.exists(f_path):
+                       if path.exists(f_path):
                            try:
                                remove(f_path)
                            except:
@@ -103,7 +107,7 @@ def get_confirm(update, context):
         else:
             res = aria2.client.get_files(id_)
             for f in res:
-                if f['selected'] == 'false' and ospath.exists(f['path']):
+                if f['selected'] == 'false' and path.exists(f['path']):
                     try:
                         remove(f['path'])
                     except:

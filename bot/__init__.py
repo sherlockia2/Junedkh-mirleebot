@@ -1,16 +1,10 @@
 from asyncio import get_event_loop
 from faulthandler import enable as faulthandler_enable
-from logging import INFO, FileHandler, StreamHandler, basicConfig
-from logging import error as log_error
-from logging import getLogger
-from logging import info as log_info
-from logging import warning as log_warning
-from os import environ
-from os import path as ospath
-from os import remove as osremove
+from logging import (INFO, FileHandler, StreamHandler, basicConfig, error,
+                     getLogger, info, warning)
+from os import environ, path, remove
 from socket import setdefaulttimeout
-from subprocess import Popen
-from subprocess import run as srun
+from subprocess import Popen, run
 from threading import Lock, Thread
 from time import sleep, time
 
@@ -57,7 +51,7 @@ qbit_options = {}
 
 try:
     if bool(environ.get('_____REMOVE_THIS_LINE_____')):
-        log_error('The README.md file there to be read! Exiting now!')
+        error('The README.md file there to be read! Exiting now!')
         exit()
 except:
     pass
@@ -79,7 +73,7 @@ btn_listener = {}
 
 BOT_TOKEN = environ.get('BOT_TOKEN', '')
 if len(BOT_TOKEN) == 0:
-    log_error("BOT_TOKEN variable is missing! Exiting now")
+    error("BOT_TOKEN variable is missing! Exiting now")
     exit(1)
 
 bot_id = int(BOT_TOKEN.split(':', 1)[0])
@@ -118,26 +112,26 @@ else:
 
 OWNER_ID = environ.get('OWNER_ID', '')
 if len(OWNER_ID) == 0:
-    log_error("OWNER_ID variable is missing! Exiting now")
+    error("OWNER_ID variable is missing! Exiting now")
     exit(1)
 else:
     OWNER_ID = int(OWNER_ID)
 
 TELEGRAM_API = environ.get('TELEGRAM_API', '')
 if len(TELEGRAM_API) == 0:
-    log_error("TELEGRAM_API variable is missing! Exiting now")
+    error("TELEGRAM_API variable is missing! Exiting now")
     exit(1)
 else:
     TELEGRAM_API = int(TELEGRAM_API)
 
 TELEGRAM_HASH = environ.get('TELEGRAM_HASH', '')
 if len(TELEGRAM_HASH) == 0:
-    log_error("TELEGRAM_HASH variable is missing! Exiting now")
+    error("TELEGRAM_HASH variable is missing! Exiting now")
     exit(1)
 
 GDRIVE_ID = environ.get('GDRIVE_ID', '')
 if len(GDRIVE_ID) == 0:
-    log_warning('GDRIVE_ID not provided!')
+    warning('GDRIVE_ID not provided!')
     GDRIVE_ID = ''
 
 DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
@@ -168,11 +162,11 @@ IS_PREMIUM_USER = False
 IS_USER_SESSION = False
 USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 if len(USER_SESSION_STRING) == 0:
-    log_info("Creating client from BOT_TOKEN")
+    info("Creating client from BOT_TOKEN")
     app = Client(name='pyrogram', api_id=TELEGRAM_API, api_hash=TELEGRAM_HASH,
                  bot_token=BOT_TOKEN, parse_mode=enums.ParseMode.HTML, no_updates=True)
 else:
-    log_info("Creating client from USER_SESSION_STRING")
+    info("Creating client from USER_SESSION_STRING")
     app = Client(name='pyrogram', api_id=TELEGRAM_API, api_hash=TELEGRAM_HASH,
                  session_string=USER_SESSION_STRING, parse_mode=enums.ParseMode.HTML, no_updates=True)
     with app:
@@ -183,19 +177,19 @@ RSS_USER_SESSION_STRING = environ.get('RSS_USER_SESSION_STRING', '')
 if len(RSS_USER_SESSION_STRING) == 0:
     rss_session = ''
 else:
-    log_info("Creating client from RSS_USER_SESSION_STRING")
+    info("Creating client from RSS_USER_SESSION_STRING")
     rss_session = Client(name='rss_session', api_id=TELEGRAM_API, api_hash=TELEGRAM_HASH,
                          session_string=RSS_USER_SESSION_STRING, parse_mode=enums.ParseMode.HTML, no_updates=True)
 
 MEGA_API_KEY = environ.get('MEGA_API_KEY', '')
 if len(MEGA_API_KEY) == 0:
-    log_warning('MEGA API KEY not provided!')
+    warning('MEGA API KEY not provided!')
     MEGA_API_KEY = ''
 
 MEGA_EMAIL_ID = environ.get('MEGA_EMAIL_ID', '')
 MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
 if len(MEGA_EMAIL_ID) == 0 or len(MEGA_PASSWORD) == 0:
-    log_warning('MEGA Credentials not provided!')
+    warning('MEGA Credentials not provided!')
     MEGA_EMAIL_ID = ''
     MEGA_PASSWORD = ''
 
@@ -214,10 +208,6 @@ if len(SEARCH_API_LINK) == 0:
 RSS_COMMAND = environ.get('RSS_COMMAND', '')
 if len(RSS_COMMAND) == 0:
     RSS_COMMAND = ''
-
-LEECH_FILENAME_PERFIX = environ.get('LEECH_FILENAME_PERFIX', '')
-if len(LEECH_FILENAME_PERFIX) == 0:
-    LEECH_FILENAME_PERFIX = ''
 
 SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
 if len(SEARCH_PLUGINS) == 0:
@@ -305,7 +295,7 @@ else:
 
 BASE_URL = environ.get('BASE_URL', '').rstrip("/")
 if len(BASE_URL) == 0:
-    log_warning('BASE_URL not provided!')
+    warning('BASE_URL not provided!')
     BASE_URL = ''
 
 UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
@@ -362,13 +352,6 @@ if len(SHARER_EMAIL) == 0 or len(SHARER_PASS) == 0:
     SHARER_EMAIL = ''
     SHARER_PASS = ''
 
-SHARER_DRIVE_SITE = environ.get('SHARER_DRIVE_SITE', '').rstrip("/")
-if len(SHARER_DRIVE_SITE) == 0:
-    SHARER_DRIVE_SITE = ''
-
-ENABLE_SHARER_LIST = environ.get('ENABLE_SHARER_LIST', '')
-ENABLE_SHARER_LIST = ENABLE_SHARER_LIST.lower() == 'true'
-
 DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
 DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
 
@@ -409,7 +392,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                 'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                 'INDEX_URL': INDEX_URL,
                 'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
-                'LEECH_FILENAME_PERFIX': LEECH_FILENAME_PERFIX,
                 'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                 'MEGA_API_KEY': MEGA_API_KEY,
                 'MEGA_EMAIL_ID': MEGA_EMAIL_ID,
@@ -452,8 +434,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                 'ENABLE_CHAT_RESTRICT': ENABLE_CHAT_RESTRICT,
                 'ENABLE_MESSAGE_FILTER': ENABLE_MESSAGE_FILTER,
                 'STOP_DUPLICATE_TASKS': STOP_DUPLICATE_TASKS,
-                'SHARER_DRIVE_SITE': SHARER_DRIVE_SITE,
-                'ENABLE_SHARER_LIST': ENABLE_SHARER_LIST,
                 'DISABLE_DRIVE_LINK': DISABLE_DRIVE_LINK,
                 'SET_COMMANDS': SET_COMMANDS,
                 'MIRROR_LOG': MIRROR_LOG,
@@ -468,7 +448,7 @@ if GDRIVE_ID:
     DRIVES_IDS.append(GDRIVE_ID)
     INDEX_URLS.append(INDEX_URL)
 
-if ospath.exists('list_drives.txt'):
+if path.exists('list_drives.txt'):
     with open('list_drives.txt', 'r+') as f:
         lines = f.readlines()
         for line in lines:
@@ -480,7 +460,7 @@ if ospath.exists('list_drives.txt'):
             else:
                 INDEX_URLS.append('')
 
-if ospath.exists('buttons.txt'):
+if path.exists('buttons.txt'):
     with open('buttons.txt', 'r+') as f:
         lines = f.readlines()
         for line in lines:
@@ -491,7 +471,7 @@ if ospath.exists('buttons.txt'):
                 BUTTON_NAMES.append(temp[0].replace("_", " "))
                 BUTTON_URLS.append(temp[1])
 
-if ospath.exists('shorteners.txt'):
+if path.exists('shorteners.txt'):
     with open('shorteners.txt', 'r+') as f:
         lines = f.readlines()
         for line in lines:
@@ -505,7 +485,7 @@ if GDRIVE_ID:
     CATEGORY_IDS.append(GDRIVE_ID)
     CATEGORY_INDEXS.append(INDEX_URL)
 
-if ospath.exists('categories.txt'):
+if path.exists('categories.txt'):
     with open('categories.txt', 'r+') as f:
         lines = f.readlines()
         for line in lines:
@@ -520,20 +500,20 @@ if ospath.exists('categories.txt'):
 if BASE_URL:
     Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
 
-srun(["qbittorrent-nox", "-d", "--profile=."])
-if not ospath.exists('.netrc'):
-    srun(["touch", ".netrc"])
-srun(["cp", ".netrc", "/root/.netrc"])
-srun(["chmod", "600", ".netrc"])
-srun(["chmod", "+x", "aria.sh"])
-srun("./aria.sh", shell=True)
-if ospath.exists('accounts.zip'):
-    if ospath.exists('accounts'):
-        srun(["rm", "-rf", "accounts"])
-    srun(["unzip", "-q", "-o", "accounts.zip", "-x", "accounts/emails.txt"])
-    srun(["chmod", "-R", "777", "accounts"])
-    osremove('accounts.zip')
-if not ospath.exists('accounts'):
+run(["qbittorrent-nox", "-d", "--profile=."])
+if not path.exists('.netrc'):
+    run(["touch", ".netrc"])
+run(["cp", ".netrc", "/root/.netrc"])
+run(["chmod", "600", ".netrc"])
+run(["chmod", "+x", "aria.sh"])
+run("./aria.sh", shell=True)
+if path.exists('accounts.zip'):
+    if path.exists('accounts'):
+        run(["rm", "-rf", "accounts"])
+    run(["unzip", "-q", "-o", "accounts.zip", "-x", "accounts/emails.txt"])
+    run(["chmod", "-R", "777", "accounts"])
+    remove('accounts.zip')
+if not path.exists('accounts'):
     config_dict['USE_SERVICE_ACCOUNTS'] = False
 sleep(0.5)
 
@@ -546,16 +526,18 @@ def get_client():
 
 def aria2c_init():
     try:
-        log_info("Initializing Aria2c")
+        info("Initializing Aria2c")
         link = "https://linuxmint.com/torrents/lmde-5-cinnamon-64bit.iso.torrent"
         dire = DOWNLOAD_DIR.rstrip("/")
         aria2.add_uris([link], {'dir': dire})
         sleep(3)
         downloads = aria2.get_downloads()
         sleep(15)
-        aria2.remove(downloads, force=True, files=True, clean=True)
+        for dl in downloads:
+            if dl:
+                dl.remove(True, True)
     except Exception as e:
-        log_error(f"Aria2c initializing error: {e}")
+        error(f"Aria2c initializing error: {e}")
 
 aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-download-result', 'log', 'log-level',
                  'max-concurrent-downloads', 'max-download-result', 'max-overall-download-limit', 'save-session',

@@ -1,7 +1,11 @@
 from time import sleep
 
 from bot import LOGGER, get_client
-from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time
+from bot.helper.ext_utils.bot_utils import (MirrorStatus,
+                                            get_readable_file_size,
+                                            get_readable_time)
+
+
 def get_download(client, hash_):
     try:
         return client.torrents_info(torrent_hashes=hash_)[0]

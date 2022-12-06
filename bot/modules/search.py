@@ -1,17 +1,20 @@
-from requests import get as rget
-from threading import Thread
 from html import escape
+from json import loads
+from threading import Thread
 from urllib.parse import quote
-from telegram.ext import CommandHandler, CallbackQueryHandler
-from json import loads as jsonloads
 
-from bot import dispatcher, LOGGER, config_dict, get_client
-from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, sendMarkup, deleteMessage, sendFile
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.bot_commands import BotCommands
+from requests import get
+from telegram.ext import CallbackQueryHandler, CommandHandler
+
+from bot import LOGGER, config_dict, dispatcher, get_client
 from bot.helper.ext_utils.bot_utils import get_readable_file_size
-from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.html_helper import html_template
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.telegram_helper.message_utils import (deleteMessage,
+                                                      editMessage, sendFile,
+                                                      sendMarkup, sendMessage)
 
 PLUGINS = []
 SITES = None
@@ -20,7 +23,7 @@ SITES = None
 def initiate_search_tools():
     if SEARCH_PLUGINS := config_dict['SEARCH_PLUGINS']:
         globals()['PLUGINS'] = []
-        src_plugins = jsonloads(SEARCH_PLUGINS)
+        src_plugins = loads(SEARCH_PLUGINS)
         qbclient = get_client()
         qb_plugins = qbclient.search_plugins()
         if qb_plugins:
@@ -32,7 +35,7 @@ def initiate_search_tools():
     if SEARCH_API_LINK := config_dict['SEARCH_API_LINK']:
         global SITES
         try:
-            res = rget(f'{SEARCH_API_LINK}/api/v1/sites').json()
+            res = get(f'{SEARCH_API_LINK}/api/v1/sites').json()
             SITES = {str(site): str(site).capitalize() for site in res['supported_sites']}
             SITES['all'] = 'All'
         except Exception as e:
@@ -127,7 +130,7 @@ def __search(bot, key, site, message, method):
             else:
                 api = f"{SEARCH_API_LINK}/api/v1/recent?site={site}&limit={SEARCH_LIMIT}"
         try:
-            resp = rget(api)
+            resp = get(api)
             search_results = resp.json()
             if 'error' in search_results or search_results['total'] == 0:
                 return editMessage(f"No result found for <i>{key}</i>\nTorrent Site:- <i>{SITES.get(site)}</i>", message)

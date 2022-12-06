@@ -1,9 +1,10 @@
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
+
 from telegram.ext import CommandHandler
 
 from bot import LOGGER, dispatcher
-from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.filters import CustomFilters
 
 
 def shell(update, context):

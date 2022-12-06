@@ -1,9 +1,6 @@
 from functools import partial
-from os import environ
-from os import path as ospath
-from os import remove, rename
-from subprocess import Popen
-from subprocess import run as srun
+from os import environ, path, remove, rename
+from subprocess import Popen, run
 from time import sleep, time
 
 from dotenv import load_dotenv
@@ -20,7 +17,6 @@ from bot import (BUTTON_NAMES, BUTTON_URLS, CATEGORY_IDS, CATEGORY_INDEXS,
 from bot.helper.ext_utils.bot_utils import (get_readable_file_size, new_thread,
                                             set_commands, setInterval)
 from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.ext_utils.jmdkh_utils import initiate_sharer_drive
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -122,10 +118,6 @@ def load_config():
     RSS_COMMAND = environ.get('RSS_COMMAND', '')
     if len(RSS_COMMAND) == 0:
         RSS_COMMAND = ''
-
-    LEECH_FILENAME_PERFIX = environ.get('LEECH_FILENAME_PERFIX', '')
-    if len(LEECH_FILENAME_PERFIX) == 0:
-        LEECH_FILENAME_PERFIX = ''
 
     SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
     if len(SEARCH_PLUGINS) == 0:
@@ -245,9 +237,9 @@ def load_config():
     BASE_URL = environ.get('BASE_URL', '').rstrip("/")
     if len(BASE_URL) == 0:
         BASE_URL = ''
-        srun(["pkill", "-9", "-f", "gunicorn"])
+        run(["pkill", "-9", "-f", "gunicorn"])
     else:
-        srun(["pkill", "-9", "-f", "gunicorn"])
+        run(["pkill", "-9", "-f", "gunicorn"])
         Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
 
     UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
@@ -307,13 +299,6 @@ def load_config():
         SHARER_EMAIL = ''
         SHARER_PASS = ''
 
-    SHARER_DRIVE_SITE = environ.get('SHARER_DRIVE_SITE', '').rstrip("/")
-    if len(SHARER_DRIVE_SITE) == 0:
-        SHARER_DRIVE_SITE = ''
-
-    ENABLE_SHARER_LIST = environ.get('ENABLE_SHARER_LIST', '')
-    ENABLE_SHARER_LIST = ENABLE_SHARER_LIST.lower() == 'true'
-
     DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
     DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
 
@@ -344,7 +329,7 @@ def load_config():
         DRIVES_IDS.append(GDRIVE_ID)
         INDEX_URLS.append(INDEX_URL)
 
-    if ospath.exists('list_drives.txt'):
+    if path.exists('list_drives.txt'):
         with open('list_drives.txt', 'r+') as f:
             lines = f.readlines()
             for line in lines:
@@ -365,7 +350,7 @@ def load_config():
         CATEGORY_IDS.append(GDRIVE_ID)
         CATEGORY_INDEXS.append(INDEX_URL)
 
-    if ospath.exists('categories.txt'):
+    if path.exists('categories.txt'):
         with open('categories.txt', 'r+') as f:
             lines = f.readlines()
             for line in lines:
@@ -395,7 +380,6 @@ def load_config():
                    'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                    'INDEX_URL': INDEX_URL,
                    'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
-                   'LEECH_FILENAME_PERFIX': LEECH_FILENAME_PERFIX,
                    'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                    'MEGA_API_KEY': MEGA_API_KEY,
                    'MEGA_EMAIL_ID': MEGA_EMAIL_ID,
@@ -438,8 +422,6 @@ def load_config():
                    'ENABLE_CHAT_RESTRICT': ENABLE_CHAT_RESTRICT,
                    'ENABLE_MESSAGE_FILTER': ENABLE_MESSAGE_FILTER,
                    'STOP_DUPLICATE_TASKS': STOP_DUPLICATE_TASKS,
-                   'SHARER_DRIVE_SITE': SHARER_DRIVE_SITE,
-                   'ENABLE_SHARER_LIST': ENABLE_SHARER_LIST,
                    'DISABLE_DRIVE_LINK': DISABLE_DRIVE_LINK,
                    'SET_COMMANDS': SET_COMMANDS,
                    'MIRROR_LOG': MIRROR_LOG,
@@ -570,7 +552,7 @@ def edit_variable(update, context, omsg, key):
         value = min(int(value), MAX_SPLIT_SIZE)
     elif key == 'SERVER_PORT':
         value = int(value)
-        srun(["pkill", "-9", "-f", "gunicorn"])
+        run(["pkill", "-9", "-f", "gunicorn"])
         Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{value}", shell=True)
     elif key == 'EXTENSION_FILTER':
         fx = value.split()
@@ -580,8 +562,6 @@ def edit_variable(update, context, omsg, key):
             GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
     elif key in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
         initiate_search_tools()
-    elif key == 'SHARER_DRIVE_SITE':
-        initiate_sharer_drive()
     elif key == 'GDRIVE_ID':
         if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
             DRIVES_IDS[0] = value
@@ -662,16 +642,16 @@ def update_private_file(update, context, omsg):
     if not message.document and message.text:
         file_name = message.text.strip()
         file_name = file_name.rsplit('.zip', 1)[0]
-        if ospath.exists(file_name):
+        if path.exists(file_name):
             remove(file_name)
         if file_name == 'accounts':
             config_dict['USE_SERVICE_ACCOUNTS'] = False
             if DATABASE_URL:
                 DbManger().update_config({'USE_SERVICE_ACCOUNTS': False})
         elif file_name in ['.netrc', 'netrc']:
-            srun(["touch", ".netrc"])
-            srun(["cp", ".netrc", "/root/.netrc"])
-            srun(["chmod", "600", ".netrc"])
+            run(["touch", ".netrc"])
+            run(["cp", ".netrc", "/root/.netrc"])
+            run(["chmod", "600", ".netrc"])
         elif file_name == 'buttons.txt':
             BUTTON_NAMES.clear()
             BUTTON_URLS.clear()
@@ -700,10 +680,10 @@ def update_private_file(update, context, omsg):
         file_name = doc.file_name
         doc.get_file().download(custom_path=file_name)
         if file_name == 'accounts.zip':
-            if ospath.exists('accounts'):
-                srun(["rm", "-rf", "accounts"])
-            srun(["unzip", "-q", "-o", "accounts.zip", "-x", "accounts/emails.txt"])
-            srun(["chmod", "-R", "777", "accounts"])
+            if path.exists('accounts'):
+                run(["rm", "-rf", "accounts"])
+            run(["unzip", "-q", "-o", "accounts.zip", "-x", "accounts/emails.txt"])
+            run(["chmod", "-R", "777", "accounts"])
         elif file_name == 'list_drives.txt':
             DRIVES_IDS.clear()
             DRIVES_NAMES.clear()
@@ -766,8 +746,8 @@ def update_private_file(update, context, omsg):
             if file_name == 'netrc':
                 rename('netrc', '.netrc')
                 file_name = '.netrc'
-            srun(["cp", ".netrc", "/root/.netrc"])
-            srun(["chmod", "600", ".netrc"])
+            run(["cp", ".netrc", "/root/.netrc"])
+            run(["chmod", "600", ".netrc"])
         elif file_name == 'config.env':
             load_dotenv('config.env', override=True)
             load_config()
@@ -782,7 +762,7 @@ def update_private_file(update, context, omsg):
     update_buttons(omsg)
     if DATABASE_URL and file_name != 'config.env':
         DbManger().update_private_file(file_name)
-    if ospath.exists('accounts.zip'):
+    if path.exists('accounts.zip'):
         remove('accounts.zip')
 
 @new_thread
@@ -834,10 +814,10 @@ def edit_bot_settings(update, context):
             if DATABASE_URL:
                 DbManger().update_aria2('bt-stop-timeout', '0')
         elif data[2] == 'BASE_URL':
-            srun(["pkill", "-9", "-f", "gunicorn"])
+            run(["pkill", "-9", "-f", "gunicorn"])
         elif data[2] == 'SERVER_PORT':
             value = 80
-            srun(["pkill", "-9", "-f", "gunicorn"])
+            run(["pkill", "-9", "-f", "gunicorn"])
             Popen("gunicorn web.wserver:app --bind 0.0.0.0:80", shell=True)
         elif data[2] == 'GDRIVE_ID':
             if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
@@ -1029,12 +1009,12 @@ def edit_bot_settings(update, context):
             update_buttons(message, data[2])
     elif data[1] == 'push':
         filename = data[2].rsplit('.zip', 1)[0]
-        if ospath.exists(filename):
-            srun([f"git add -f {filename} \
+        if path.exists(filename):
+            run([f"git add -f {filename} \
                     && git commit -sm botsettings -q \
                     && git push origin {config_dict['UPSTREAM_BRANCH']} -q"], shell=True)
         else:
-            srun([f"git rm -r --cached {filename} \
+            run([f"git rm -r --cached {filename} \
                     && git commit -sm botsettings -q \
                     && git push origin {config_dict['UPSTREAM_BRANCH']} -q"], shell=True)
         message.delete()
