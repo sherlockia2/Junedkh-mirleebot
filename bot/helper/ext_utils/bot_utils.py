@@ -256,12 +256,6 @@ def is_gdrive_link(url: str):
         return "drive.google.com" in url_.netloc
     return False
 
-def is_sharer_link(url: str):
-    url_ = urlparse(url)
-    if url_.scheme in ['http','https']:
-        return any(x in url_.netloc for x in ['gdtot', 'hubdrive'])
-    return False
-
 def is_mega_link(url: str):
     url_ = urlparse(url)
     if url_.scheme in ['http','https']:

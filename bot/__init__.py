@@ -333,10 +333,6 @@ LEECH_LIMIT = '' if len(LEECH_LIMIT) == 0 else float(LEECH_LIMIT)
 MAX_PLAYLIST = environ.get('MAX_PLAYLIST', '')
 MAX_PLAYLIST = '' if len(MAX_PLAYLIST) == 0 else int(MAX_PLAYLIST)
 
-GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
-if len(GDTOT_CRYPT) == 0:
-    GDTOT_CRYPT = ''
-
 ENABLE_CHAT_RESTRICT = environ.get('ENABLE_CHAT_RESTRICT', '')
 ENABLE_CHAT_RESTRICT = ENABLE_CHAT_RESTRICT.lower() == 'true'
 
@@ -345,12 +341,6 @@ ENABLE_MESSAGE_FILTER = ENABLE_MESSAGE_FILTER.lower() == 'true'
 
 STOP_DUPLICATE_TASKS = environ.get('STOP_DUPLICATE_TASKS', '')
 STOP_DUPLICATE_TASKS = STOP_DUPLICATE_TASKS.lower() == 'true'
-
-SHARER_EMAIL = environ.get('SHARER_EMAIL', '')
-SHARER_PASS = environ.get('SHARER_PASS', '')
-if len(SHARER_EMAIL) == 0 or len(SHARER_PASS) == 0:
-    SHARER_EMAIL = ''
-    SHARER_PASS = ''
 
 DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
 DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
@@ -430,15 +420,12 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                 'MEGA_LIMIT': MEGA_LIMIT,
                 'LEECH_LIMIT': LEECH_LIMIT,
                 'MAX_PLAYLIST': MAX_PLAYLIST,
-                'GDTOT_CRYPT': GDTOT_CRYPT,
                 'ENABLE_CHAT_RESTRICT': ENABLE_CHAT_RESTRICT,
                 'ENABLE_MESSAGE_FILTER': ENABLE_MESSAGE_FILTER,
                 'STOP_DUPLICATE_TASKS': STOP_DUPLICATE_TASKS,
                 'DISABLE_DRIVE_LINK': DISABLE_DRIVE_LINK,
                 'SET_COMMANDS': SET_COMMANDS,
                 'MIRROR_LOG': MIRROR_LOG,
-                'SHARER_EMAIL': SHARER_EMAIL,
-                'SHARER_PASS': SHARER_PASS,
                 'DISABLE_LEECH': DISABLE_LEECH,
                 'ENABLE_DM': ENABLE_DM,
                 'DELETE_LINKS': DELETE_LINKS}

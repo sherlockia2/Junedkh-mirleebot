@@ -96,7 +96,7 @@ In each single file there is a major change from base code, it's almost totaly d
 - Extract these filetypes
   > ZIP, RAR, TAR, 7z, ISO, WIM, CAB, GZIP, BZIP2, APM, ARJ, CHM, CPIO, CramFS, DEB, DMG, FAT, HFS, LZH, LZMA, LZMA2, MBR, MSI, MSLZ, NSIS, NTFS, RPM, SquashFS, UDF, VHD, XAR, Z, TAR.XZ
 - Direct links Supported:
-  >mediafire, letsupload.io, hxfile.co, anonfiles.com, bayfiles.com, antfiles, fembed.com, fembed.net, femax20.com, layarkacaxxi.icu, fcdn.stream, sbplay.org, naniplay.com, naniplay.nanime.in, naniplay.nanime.biz, sbembed.com, streamtape.com, streamsb.net, feurl.com, upload.ee, pixeldrain.com, racaty.net, 1fichier.com, 1drv.ms (Only works for file not folder or business account), uptobox.com and solidfiles.com
+  >mediafire, letsupload.io, hxfile.co, anonfiles.com, bayfiles.com, antfiles, fembed.com, fembed.net, femax20.com, layarkacaxxi.icu, fcdn.stream, sbplay.org, naniplay.com, naniplay.nanime.in, naniplay.nanime.biz, sbembed.com, streamtape.com, streamsb.net, feurl.com, upload.ee, pixeldrain.com, racaty.net, 1fichier.com, 1drv.ms (Only works for file not folder or business account), uptobox.com and solidfiles.com, mdisk.me (using ytdl command), terabox.com (you need to add cookies txt with name) [terabox.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid)
 
 ## By [Junedkh](https://github.com/junedkh)
 ### Repo is design for big groups
@@ -112,8 +112,6 @@ In each single file there is a major change inspire from base code by my friend 
 - YTDLP limits
 - Google drive limits
 
-### Sharer Drive
-- Clone support for sites like GDToT, appdrive, driveapp, hubdrive
 
 ### Group Features
 - Force subscribe module
@@ -245,15 +243,6 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 - `DIRECT_LIMIT`: To limit the size of direct link download. Don't add unit, the default unit is `GB`.
 - `YTDLP_LIMIT`: To limit the size of ytdlp download. Don't add unit, the default unit is `GB`.
 - `GDRIVE_LIMIT`: To limit the size of Google Drive folder/file which you can use for leech etc. Don't add unit, the default unit is `GB`.
-
-### Sharer Drive
-- `GDTOT_CRYPT`: To download/clone gdtot link. `Str`
-- `SHARER_EMAIL`: youremail@gmail.com `Str`
-- `SHARER_PASS`: yourpassword_which_you_create_from `Str`
-  - Currently Supported Sites:
-    > hubdrive
-  - Will add more in future on public demand.
-  - **Note**: Must change account password from supported sharer [account](https://appdrive.info/account) settings. same email and same password.
 
 ### Group Features
 - `FSUB_IDS`: Fill chat_id of groups/channel you want to force subscribe. Separate them by space. `Str`
@@ -535,7 +524,7 @@ ouo.io LYT0zBn1
 >exe.io, gplinks.in, shrinkme.io, urlshortx.com, shortzon.com, bit.ly, shorte.st, linkvertise.com , ouo.io, adfoc.us, cutt.ly
 -----
 ### Extra Buttons
-- Five buttons are already added including Sharer, Drive Link, Index Link, Log and View Link, You can add up to four extra buttons if you don't know what are the below entries.
+- Four buttons are already added, Drive Link, Index Link, Log and View Link, You can add up to four extra buttons if you don't know what are the below entries.
 You can simply create `buttons.txt` file in working directory and fill it, check below format:
 ```
 button_name button_url

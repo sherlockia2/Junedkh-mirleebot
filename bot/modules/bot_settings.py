@@ -277,9 +277,6 @@ def load_config():
     MAX_PLAYLIST = environ.get('MAX_PLAYLIST', '')
     MAX_PLAYLIST = '' if len(MAX_PLAYLIST) == 0 else int(MAX_PLAYLIST)
 
-    GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
-    if len(GDTOT_CRYPT) == 0:
-        GDTOT_CRYPT = ''
 
     ENABLE_CHAT_RESTRICT = environ.get('ENABLE_CHAT_RESTRICT', '')
     ENABLE_CHAT_RESTRICT = ENABLE_CHAT_RESTRICT.lower() == 'true'
@@ -292,12 +289,6 @@ def load_config():
 
     if not STOP_DUPLICATE_TASKS and DATABASE_URL:
         DbManger().clear_download_links()
-
-    SHARER_EMAIL = environ.get('SHARER_EMAIL', '')
-    SHARER_PASS = environ.get('SHARER_PASS', '')
-    if len(SHARER_EMAIL) == 0 or len(SHARER_PASS) == 0:
-        SHARER_EMAIL = ''
-        SHARER_PASS = ''
 
     DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
     DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
@@ -418,15 +409,12 @@ def load_config():
                    'MEGA_LIMIT': MEGA_LIMIT,
                    'LEECH_LIMIT': LEECH_LIMIT,
                    'MAX_PLAYLIST': MAX_PLAYLIST,
-                   'GDTOT_CRYPT': GDTOT_CRYPT,
                    'ENABLE_CHAT_RESTRICT': ENABLE_CHAT_RESTRICT,
                    'ENABLE_MESSAGE_FILTER': ENABLE_MESSAGE_FILTER,
                    'STOP_DUPLICATE_TASKS': STOP_DUPLICATE_TASKS,
                    'DISABLE_DRIVE_LINK': DISABLE_DRIVE_LINK,
                    'SET_COMMANDS': SET_COMMANDS,
                    'MIRROR_LOG': MIRROR_LOG,
-                   'SHARER_EMAIL': SHARER_EMAIL,
-                   'SHARER_PASS': SHARER_PASS,
                    'DISABLE_LEECH': DISABLE_LEECH,
                    'ENABLE_DM': ENABLE_DM,
                    'DELETE_LINKS': DELETE_LINKS})
@@ -458,7 +446,7 @@ def get_buttons(key=None, edit_type=None):
     elif key == 'private':
         buttons.sbutton('Back', "botset back")
         buttons.sbutton('Close', "botset close")
-        msg = f'Send private file: config.env, token.pickle, accounts.zip, list_drives.txt, categories.txt, shortnners.txt, buttons.txt, cookies.txt or .netrc.\nTimeout: 60 sec' \
+        msg = f'Send private file: config.env, token.pickle, accounts.zip, list_drives.txt, categories.txt, shortnners.txt, buttons.txt, cookies.txt, terabox.txt or .netrc.\nTimeout: 60 sec' \
             '\nTo delete private file send the name of the file only as text message.\nTimeout: 60 sec'
     elif key == 'aria':
         for k in list(aria2_options.keys())[START:10+START]:

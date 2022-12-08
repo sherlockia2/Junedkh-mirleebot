@@ -8,8 +8,10 @@ from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no c
 than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
 for original authorship. """
 
-from base64 import b64decode, standard_b64encode
+from base64 import standard_b64encode
+from http.cookiejar import MozillaCookieJar
 from json import loads
+from os import path
 from re import findall, match, search, sub
 from time import sleep
 from urllib.parse import unquote, urlparse
@@ -70,10 +72,8 @@ def direct_link_generator(link: str):
         return krakenfiles(link)
     elif 'upload.ee' in domain:
         return uploadee(link)
-    elif 'gdtot' in domain:
-        return gdtot(link)
-    elif 'hubdrive' in domain:
-        return hubdrive(link)
+    elif 'terabox' in domain:
+        return terabox(link)
     elif any(x in domain for x in fmed_list):
         return fembed(link)
     elif any(x in domain for x in ['sbembed.com', 'watchsb.com', 'streamsb.net', 'sbplay.org']):
@@ -420,48 +420,23 @@ def uploadee(url: str) -> str:
     except:
         raise DirectDownloadLinkException(f"ERROR: Failed to acquire download URL from upload.ee for : {url}")
 
-def gdtot(url: str) -> str:
-    """ Gdtot google drive link generator
-    By https://github.com/xcscxr """
-    if not config_dict['GDTOT_CRYPT']:
-        raise DirectDownloadLinkException("ERROR: GDTOT_CRYPT not provided")
-    parsed_url = urlparse(url)
-    client = Session()
+def terabox(url) -> str:
+    if not path.isfile('terabox.txt'):
+        raise DirectDownloadLinkException("ERROR: terabox.txt not found")
     try:
-        client.cookies.set(name='crypt', value=config_dict['GDTOT_CRYPT'], domain=parsed_url.netloc)
-        res = client.request('get', url)
+        session = Session()
+        res = session.request('GET', url)
+        key = res.url.split('?surl=')[-1]
+        jar = MozillaCookieJar('terabox.txt')
+        jar.load()
+        session.cookies.update(jar)
+        res = session.request('GET', f'https://www.terabox.com/share/list?app_id=250528&shorturl={key}&root=1')
+        result = res.json()['list']
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    try:
-        res = client.request('get', f"{parsed_url.scheme}://{parsed_url.netloc}/dld?id={url.split('/')[-1]}")
-        matches = findall('gd=(.*?)&', res.text)
-        decoded_id = b64decode(str(matches[0])).decode('utf-8')
-        return f'https://drive.google.com/open?id={decoded_id}'
-    except:
-        raise DirectDownloadLinkException("ERROR: Try in your browser, mostly file not found or user limit exceeded!")
-
-def hubdrive(url: str) -> str:
-    """ Hubdrive google drive link generator
-    By https://github.com/xcscxr """
-    SHARER_EMAIL = config_dict['SHARER_EMAIL']
-    SHARER_PASS = config_dict['SHARER_PASS']
-    if not SHARER_EMAIL or not SHARER_PASS:
-        raise DirectDownloadLinkException("ERROR: SHARER_EMAIL not provided")
-    parsed_url = urlparse(url)
-    client = Session()
-    try:
-        client.request('post', f'{parsed_url.scheme}://{parsed_url.netloc}/sign', data={'email': SHARER_EMAIL, 'pass': SHARER_PASS})
-    except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    try:
-        client.cookies.get_dict()['crypt']
-    except:
-        raise DirectDownloadLinkException("ERROR: invalid SHARER_EMAIL")
-    try:
-        res = client.request('get', url)
-        req_url = f"{parsed_url.scheme}://{parsed_url.netloc}/ajax.php?ajax=download"
-        res = client.request('post', req_url, headers={'x-requested-with': 'XMLHttpRequest'}, data={'id': url.split('/')[-1]}).json()['file']
-        client.request('get', f'{parsed_url.scheme}://{parsed_url.netloc}/login.php?action=logout')
-        return f'https://drive.google.com/open?id={res.split("gd=")[-1]}'
-    except:
-        raise DirectDownloadLinkException("ERROR: Try in your browser, mostly file not found or user limit exceeded!")
+    if len(result) > 1:
+        raise DirectDownloadLinkException("ERROR: Can't download mutiple files")
+    result = result[0]
+    if result['isdir'] != '0':
+        raise DirectDownloadLinkException("ERROR: Can't download folder")
+    return result['dlink']
