@@ -160,6 +160,7 @@ class TgUploader:
                                                                  reply_markup=self.__button,
                                                                  progress=self.__upload_progress)
             if self.__listener.dmMessage and self.__sent_DMmsg:
+                sleep(1)
                 if IS_USER_SESSION:
                     self.__sent_DMmsg = self.__listener.bot.copy_message(
                     chat_id=self.__listener.message.from_user.id,

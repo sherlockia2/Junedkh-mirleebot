@@ -36,7 +36,7 @@ def mirror_status(update, context):
             if Interval:
                 Interval[0].cancel()
                 Interval.clear()
-                Interval.append(setInterval(config_dict['STATUS_UPDATE_INTERVAL'], update_all_messages))
+                Interval.append(setInterval(config_dict['DOWNLOAD_STATUS_UPDATE_INTERVAL'], update_all_messages))
 
 @new_thread
 def status_pages(update, context):

@@ -32,7 +32,7 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'DOWNLOAD_DIR': '/usr/src/app/downloads/',
                   'LEECH_SPLIT_SIZE': MAX_SPLIT_SIZE,
                   'RSS_DELAY': 900,
-                  'STATUS_UPDATE_INTERVAL': 10,
+                  'DOWNLOAD_STATUS_UPDATE_INTERVAL': 10,
                   'SEARCH_LIMIT': 0,
                   'UPSTREAM_BRANCH': 'master'}
 
@@ -131,17 +131,17 @@ def load_config():
     else:
         LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE)
 
-    STATUS_UPDATE_INTERVAL = environ.get('STATUS_UPDATE_INTERVAL', '')
-    if len(STATUS_UPDATE_INTERVAL) == 0:
-        STATUS_UPDATE_INTERVAL = 10
+    DOWNLOAD_STATUS_UPDATE_INTERVAL = environ.get('DOWNLOAD_STATUS_UPDATE_INTERVAL', '')
+    if len(DOWNLOAD_STATUS_UPDATE_INTERVAL) == 0:
+        DOWNLOAD_STATUS_UPDATE_INTERVAL = 10
     else:
-        STATUS_UPDATE_INTERVAL = int(STATUS_UPDATE_INTERVAL)
+        DOWNLOAD_STATUS_UPDATE_INTERVAL = int(DOWNLOAD_STATUS_UPDATE_INTERVAL)
     if len(download_dict) != 0:
         with status_reply_dict_lock:
             if Interval:
                 Interval[0].cancel()
                 Interval.clear()
-                Interval.append(setInterval(STATUS_UPDATE_INTERVAL, update_all_messages))
+                Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
 
     AUTO_DELETE_MESSAGE_DURATION = environ.get('AUTO_DELETE_MESSAGE_DURATION', '')
     if len(AUTO_DELETE_MESSAGE_DURATION) == 0:
@@ -386,7 +386,7 @@ def load_config():
                    'SERVER_PORT': SERVER_PORT,
                    'STATUS_LIMIT': STATUS_LIMIT,
                    'USER_MAX_TASKS': USER_MAX_TASKS,
-                   'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
+                   'DOWNLOAD_STATUS_UPDATE_INTERVAL': DOWNLOAD_STATUS_UPDATE_INTERVAL,
                    'STOP_DUPLICATE': STOP_DUPLICATE,
                    'SUDO_USERS': SUDO_USERS,
                    'TELEGRAM_API': TELEGRAM_API,
@@ -518,7 +518,7 @@ def edit_variable(update, context, omsg, key):
     elif key == 'DOWNLOAD_DIR':
         if not value.endswith('/'):
             value = f'{value}/'
-    elif key == 'STATUS_UPDATE_INTERVAL':
+    elif key == 'DOWNLOAD_STATUS_UPDATE_INTERVAL':
         value = int(value)
         if len(download_dict) != 0:
             with status_reply_dict_lock:
@@ -781,7 +781,7 @@ def edit_bot_settings(update, context):
         value = ''
         if data[2] in default_values:
             value = default_values[data[2]]
-            if data[2] == "STATUS_UPDATE_INTERVAL" and len(download_dict) != 0:
+            if data[2] == "DOWNLOAD_STATUS_UPDATE_INTERVAL" and len(download_dict) != 0:
                 with status_reply_dict_lock:
                     if Interval:
                         Interval[0].cancel()

@@ -159,12 +159,12 @@ if len(EXTENSION_FILTER) > 0:
         GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
 
 IS_PREMIUM_USER = False
-IS_USER_SESSION = False
 USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 if len(USER_SESSION_STRING) == 0:
     info("Creating client from BOT_TOKEN")
     app = Client(name='pyrogram', api_id=TELEGRAM_API, api_hash=TELEGRAM_HASH,
                  bot_token=BOT_TOKEN, parse_mode=enums.ParseMode.HTML, no_updates=True)
+    IS_USER_SESSION = False
 else:
     info("Creating client from USER_SESSION_STRING")
     app = Client(name='pyrogram', api_id=TELEGRAM_API, api_hash=TELEGRAM_HASH,
@@ -221,11 +221,11 @@ if len(LEECH_SPLIT_SIZE) == 0 or int(LEECH_SPLIT_SIZE) > MAX_SPLIT_SIZE:
 else:
     LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE)
 
-STATUS_UPDATE_INTERVAL = environ.get('STATUS_UPDATE_INTERVAL', '')
-if len(STATUS_UPDATE_INTERVAL) == 0:
-    STATUS_UPDATE_INTERVAL = 10
+DOWNLOAD_STATUS_UPDATE_INTERVAL = environ.get('DOWNLOAD_STATUS_UPDATE_INTERVAL', '')
+if len(DOWNLOAD_STATUS_UPDATE_INTERVAL) == 0:
+    DOWNLOAD_STATUS_UPDATE_INTERVAL = 10
 else:
-    STATUS_UPDATE_INTERVAL = int(STATUS_UPDATE_INTERVAL)
+    DOWNLOAD_STATUS_UPDATE_INTERVAL = int(DOWNLOAD_STATUS_UPDATE_INTERVAL)
 
 AUTO_DELETE_MESSAGE_DURATION = environ.get('AUTO_DELETE_MESSAGE_DURATION', '')
 if len(AUTO_DELETE_MESSAGE_DURATION) == 0:
@@ -397,7 +397,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                 'SERVER_PORT': SERVER_PORT,
                 'STATUS_LIMIT': STATUS_LIMIT,
                 'USER_MAX_TASKS': USER_MAX_TASKS,
-                'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
+                'DOWNLOAD_STATUS_UPDATE_INTERVAL': DOWNLOAD_STATUS_UPDATE_INTERVAL,
                 'STOP_DUPLICATE': STOP_DUPLICATE,
                 'SUDO_USERS': SUDO_USERS,
                 'TELEGRAM_API': TELEGRAM_API,

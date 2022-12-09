@@ -23,7 +23,7 @@ from bot.helper.telegram_helper.message_utils import (editMessage, sendLogFile, 
 from bot.modules import (authorize, bot_settings, bt_select, cancel_mirror,
                          category_select, clone, count, delete, drive_list,
                          eval, mirror_leech, mirror_status, rmdb, rss,
-                         save_message, search, shell, users_settings, ytdlp)
+                         save_message, search, shell, users_settings, ytdlp, bot_updater)
 from bot.version import __changelog__, __version__
 
 
@@ -140,12 +140,10 @@ def bot_help(update, context):
     sendMessage(help_string, context.bot, update.message)
 
 def send_changelog():
-    changelogMsg = f'<b>Bot Version</b>: {__version__}\n\n'
-    changelogMsg += __changelog__
     try:
         for i in user_data:
             if str(i).startswith('-100') and user_data[i].get('is_auth'):
-                bot.sendMessage(chat_id=i, text=changelogMsg, parse_mode='HTML')
+                bot.sendMessage(chat_id=i, text=__changelog__, parse_mode='HTML')
     except Exception as e:
         LOGGER.error(e)
 
